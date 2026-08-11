@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Box, Chip, Stack, Typography, Link as MuiLink } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Chip, Stack, Typography, Link as MuiLink, CircularProgress } from "@mui/material";
 import GlowCard from "./GlowCard";
 import Image from "next/image";
 import { TProject } from "@/types/respon/project.type";
@@ -20,9 +20,14 @@ type TProps = {
 
 export default function ProjectItem({ project, index, showFullDirectly = false, isAdmin = false }: TProps) {
    const [isFlipped, setIsFlipped] = useState<boolean>(false);
+   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
 
    const logoUrl = getMediaUrl(FB_FOLDER_LOGO, project.img_logo_name);
    const projectImgUrl = getMediaUrl(FB_FOLDER_PROJECT, project.img_project_name);
+
+   useEffect(() => {
+      setImgLoaded(false);
+   }, [projectImgUrl]);
 
    const techList = Array.isArray(project.technologies)
       ? project.technologies
@@ -430,12 +435,46 @@ export default function ProjectItem({ project, index, showFullDirectly = false, 
                      },
                   }}
                >
+                  {/* Glassmorphic Pulse Shimmer Skeleton */}
+                  {!imgLoaded && (
+                     <Box
+                        sx={{
+                           position: "absolute",
+                           top: 0,
+                           left: 0,
+                           width: "100%",
+                           height: "100%",
+                           background: "linear-gradient(90deg, rgba(20, 24, 40, 0.95) 0%, rgba(139, 92, 246, 0.25) 50%, rgba(20, 24, 40, 0.95) 100%)",
+                           backgroundSize: "200% 100%",
+                           animation: "shimmerPulse 1.5s infinite linear",
+                           display: "flex",
+                           alignItems: "center",
+                           justifyContent: "center",
+                           zIndex: 1,
+                           "@keyframes shimmerPulse": {
+                              "0%": { backgroundPosition: "-200% 0" },
+                              "100%": { backgroundPosition: "200% 0" },
+                           },
+                        }}
+                     >
+                        <CircularProgress size={36} sx={{ color: "#a78bfa" }} />
+                     </Box>
+                  )}
+
                   <Image
                      src={projectImgUrl}
                      width={0}
                      height={0}
                      sizes="100vw"
-                     style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}
+                     onLoadingComplete={() => setImgLoaded(true)}
+                     style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "block",
+                        objectFit: "cover",
+                        opacity: imgLoaded ? 1 : 0,
+                        transition: "opacity 0.35s ease-in-out",
+                     }}
                      alt={project.title || "Project Image"}
                      priority={true}
                   />

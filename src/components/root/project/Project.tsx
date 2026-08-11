@@ -11,6 +11,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import { getMediaUrl, FB_FOLDER_PROJECT } from "@/constants/firebase.constant";
 
 type TProps = {
    dataProjects: TResonAction<TProject[] | null>;
@@ -40,11 +41,21 @@ const slideVariants = {
 export default function Project({ dataProjects, dataTextInPage }: TProps) {
    const { mode, setMode } = useColorScheme();
    const [isLoaded, setIsLoaded] = useState<boolean>(false);
+   const allProjects = dataProjects.data || [];
 
    useEffect(() => {
       if (mode !== `dark`) {
          setMode(`dark`);
       }
+
+      // Preload all project images in background so slide navigation is 100% instant
+      allProjects.forEach((proj) => {
+         const imgUrl = getMediaUrl(FB_FOLDER_PROJECT, proj.img_project_name);
+         if (imgUrl && typeof window !== "undefined") {
+            const img = new window.Image();
+            img.src = imgUrl;
+         }
+      });
 
       // Delay entrance animation until page loading overlay finishes (~1.5s)
       const timer = setTimeout(() => {
@@ -52,9 +63,8 @@ export default function Project({ dataProjects, dataTextInPage }: TProps) {
       }, 1500);
 
       return () => clearTimeout(timer);
-   }, [mode, setMode]);
+   }, [mode, setMode, allProjects]);
 
-   const allProjects = dataProjects.data || [];
    const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
    const [currentIndex, setCurrentIndex] = useState<number>(0);
    const [slideDirection, setSlideDirection] = useState<number>(1);
