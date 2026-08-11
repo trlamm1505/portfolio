@@ -6,6 +6,9 @@ import { getTextInPageByPageAction } from "@/actions/title-in-page.action";
 import About from "@/components/root/about/About";
 import { ROUTER } from "@/constants/router.constant";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AboutPage() {
    const responInfoGitHubAction = await getInfoGitHubAction();
    const dataTextInPage = await getTextInPageByPageAction(ROUTER.ABOUT);

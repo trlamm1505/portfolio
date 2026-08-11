@@ -3,6 +3,9 @@ import { getTextInPageByPageAction } from "@/actions/title-in-page.action";
 import Project from "@/components/root/project/Project";
 import { ROUTER } from "@/constants/router.constant";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ProjectPage() {
    const dataProjects = await getProjectsAction();
    const dataTextInPage = await getTextInPageByPageAction(ROUTER.PROJECT);

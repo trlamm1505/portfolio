@@ -74,7 +74,7 @@ export const updateTextInPageAction = async (
 
       const updateProjects = await TextInPages.updateOne({ _id: payload._id }, payload);
 
-      revalidatePath(`/`);
+      revalidatePath('/', 'layout');
 
       return responAction(true, updateProjects as any, `Update project successfuly`);
    } catch (error: any) {
