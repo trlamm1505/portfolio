@@ -26,6 +26,9 @@ export default function AdminLayout({ children }: TProps) {
                lg: `auto 1fr`,
             },
             gridTemplateRows: `1fr`,
+            backgroundColor: `#f5f0fc`,
+            backgroundImage: `linear-gradient(135deg, #f8f5fd 0%, #ede4fc 100%)`,
+            color: `#221638`,
          }}
       >
          {!isMobile && <NavAdmin />}

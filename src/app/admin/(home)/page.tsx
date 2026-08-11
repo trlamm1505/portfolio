@@ -1,5 +1,6 @@
-import Home from "@/components/admin/home/Home";
+import { ROUTER } from "@/constants/router.constant";
+import { redirect } from "next/navigation";
 
 export default function page() {
-   return <Home />;
+   redirect(ROUTER.ADMIN.AUTH.LOGIN);
 }

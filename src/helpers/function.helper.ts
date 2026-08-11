@@ -51,7 +51,7 @@ export const isExtImage = (file: File): boolean => {
    return false;
 };
 
-export const isFileSizeValid = (file: File, maxSizeInMB: number = 1): boolean => {
+export const isFileSizeValid = (file: File, maxSizeInMB: number = 10): boolean => {
    const maxSizeInBytes = maxSizeInMB * 1024 * 1024; // Chuyển đổi MB sang byte
    return file.size <= maxSizeInBytes;
 };

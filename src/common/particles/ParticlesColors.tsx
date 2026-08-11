@@ -1,23 +1,26 @@
 "use client";
 
 import { loadFull } from "tsparticles";
-import { useCallback } from "react";
-import Particles from "react-tsparticles";
-import { Engine } from "tsparticles-engine";
+import { useEffect, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { Engine } from "@tsparticles/engine";
 
 function ParticlesColors() {
-   // init
-   const particlesInit = useCallback(async (engine: Engine) => {
-      await loadFull(engine);
+   const [init, setInit] = useState(false);
+
+   useEffect(() => {
+      initParticlesEngine(async (engine: Engine) => {
+         await loadFull(engine);
+      }).then(() => {
+         setInit(true);
+      });
    }, []);
 
-   const particlesLoaded = useCallback(async () => {}, []);
+   if (!init) return null;
 
    return (
       <Particles
          id="ParticlesColors"
-         init={particlesInit}
-         loaded={particlesLoaded}
          options={{
             autoPlay: true,
             background: {

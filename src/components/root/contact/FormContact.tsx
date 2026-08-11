@@ -23,6 +23,7 @@ function FormContact({ dataTextInPage }: TProps) {
       initialValues: {
          name: ``,
          email: ``,
+         subject: ``,
          message: ``,
       },
       validationSchema: Yup.object().shape({
@@ -31,11 +32,10 @@ function FormContact({ dataTextInPage }: TProps) {
             .trim()
             .required("Email is required.")
             .email("Invalid email. Please try again."),
+         subject: Yup.string().trim(),
          message: Yup.string().trim().required("Message is required."),
       }),
       onSubmit: async (valuesRaw) => {
-         console.log(valuesRaw);
-
          setLoading(true);
          const result = await sendMailAction({
             value: valuesRaw,
@@ -45,41 +45,64 @@ function FormContact({ dataTextInPage }: TProps) {
 
          if (result.status) {
             toast.success(`Thank you for reaching out! We'll get back to you shortly.`);
+            contactForm.resetForm();
          } else {
             toast.warning(`Sorry, the system is under maintenance, please try again later`);
          }
       },
    });
+
+   const phoneInfo = dataTextInPage.data?.description?.split(`/`)[0] || "";
+   const emailInfo = dataTextInPage.data?.description?.split(`/`)[1] || "";
+
    return (
-      <Stack component="form" autoComplete="false" onSubmit={contactForm.handleSubmit} rowGap={3}>
+      <Stack component="form" autoComplete="off" onSubmit={contactForm.handleSubmit} rowGap={2.5}>
+         {/* Row 1: Side-by-side Name & Email */}
+         <Stack direction={{ xs: "column", sm: "row" }} gap="20px">
+            <TextField
+               fullWidth
+               autoComplete="name"
+               label="name"
+               name="name"
+               value={contactForm.values.name}
+               onChange={contactForm.handleChange}
+               error={contactForm.touched.name && contactForm.errors.name !== undefined}
+               helperText={contactForm.touched.name && contactForm.errors.name}
+               variant="outlined"
+            />
+            <TextField
+               fullWidth
+               autoComplete="email"
+               label="email"
+               name="email"
+               value={contactForm.values.email}
+               onChange={contactForm.handleChange}
+               error={contactForm.touched.email && contactForm.errors.email !== undefined}
+               helperText={contactForm.touched.email && contactForm.errors.email}
+               variant="outlined"
+            />
+         </Stack>
+
+         {/* Row 2: Subject */}
          <TextField
-            sx={{ width: `100%` }}
-            autoComplete="name"
-            label="Name"
-            name="name"
-            value={contactForm.values.name}
+            fullWidth
+            autoComplete="subject"
+            label="subject"
+            name="subject"
+            value={contactForm.values.subject}
             onChange={contactForm.handleChange}
-            error={contactForm.touched.name && contactForm.errors.name !== undefined}
-            helperText={contactForm.touched.name && contactForm.errors.name}
+            error={contactForm.touched.subject && contactForm.errors.subject !== undefined}
+            helperText={contactForm.touched.subject && contactForm.errors.subject}
             variant="outlined"
          />
+
+         {/* Row 3: Message Textarea */}
          <TextField
-            sx={{ width: `100%` }}
-            autoComplete="email"
-            label="Email"
-            name="email"
-            value={contactForm.values.email}
-            onChange={contactForm.handleChange}
-            error={contactForm.touched.email && contactForm.errors.email !== undefined}
-            helperText={contactForm.touched.email && contactForm.errors.email}
-            variant="outlined"
-         />
-         <TextField
-            sx={{ width: `100%` }}
+            fullWidth
             multiline
-            rows={10}
+            rows={8}
             autoComplete="message"
-            label="Message"
+            label="message"
             name="message"
             value={contactForm.values.message}
             onChange={contactForm.handleChange}
@@ -87,101 +110,109 @@ function FormContact({ dataTextInPage }: TProps) {
             helperText={contactForm.touched.message && contactForm.errors.message}
             variant="outlined"
          />
+
+         {/* Row 4: Submit Button & Contact Details */}
          <Stack
             sx={{
                flexDirection: {
                   xs: `column`,
                   sm: `row`,
                },
+               alignItems: { xs: `stretch`, sm: `center` },
                gap: `20px`,
-               height: `52px`,
+               mt: `10px`,
             }}
          >
             <LoadingButton
-               onClick={() => {
-                  contactForm.handleSubmit();
-               }}
+               onClick={() => contactForm.handleSubmit()}
                loading={loading}
                loadingPosition="end"
                endIcon={<SendRoundedIcon sx={{ fontSize: `16px !important` }} />}
                variant="outlined"
                size="large"
                sx={{
+                  px: `30px`,
+                  py: `12px`,
+                  height: `48px`,
                   borderRadius: `999999px`,
                   textTransform: `none`,
-                  fontSize: `18px`,
-                  fontWeight: `500`,
-                  height: `100%`,
+                  fontSize: `16px`,
+                  fontWeight: `600`,
+                  color: `#ffffff`,
+                  borderColor: `rgba(255, 255, 255, 0.3)`,
+                  transition: `all 0.3s ease`,
+                  "&:hover": {
+                     backgroundColor: `#b388ff`,
+                     borderColor: `#b388ff`,
+                     color: `#ffffff`,
+                     boxShadow: `0 4px 20px rgba(179, 136, 255, 0.4)`,
+                  },
                }}
-               color="error"
             >
                Lets talk
             </LoadingButton>
 
-            {/* DIVIDER */}
-            <Box
-               sx={{
-                  display: {
-                     xs: `none`,
-                     sm: `block`,
-                  },
-               }}
-            >
-               <Divider orientation={`vertical`} sx={{ height: `100%` }} />
-            </Box>
+            {/* Vertical Divider & Info (Rendered only if data exists in Admin DB) */}
+            {(phoneInfo || emailInfo) && (
+               <>
+                  <Box
+                     sx={{
+                        display: {
+                           xs: `none`,
+                           sm: `block`,
+                        },
+                        height: `40px`,
+                     }}
+                  >
+                     <Divider orientation="vertical" sx={{ height: `100%`, borderColor: `rgba(255, 255, 255, 0.15)` }} />
+                  </Box>
 
-            <Stack sx={{ height: `100%`, alignItems: `start`, justifyContent: `space-evenly` }}>
-               <Stack
-                  sx={{
-                     flexDirection: `row`,
-                     gap: `10px`,
-                     alignItems: `center`,
-                     justifyContent: `center`,
-                  }}
-               >
-                  <LocalPhoneRoundedIcon
-                     sx={{ fontSize: `18px`, color: `rgba(255,255,255, 0.5)` }}
-                  />
-                  <Box
-                     sx={{
-                        "textDecoration": `none`,
-                        "color": `white`,
-                        "&:hover": { color: `#69b1ff` },
-                        "transition": `color .3s`,
-                        "fontSize": `14px`,
-                     }}
-                     component={`a`}
-                     href="tel:0836789578"
-                  >
-                     {dataTextInPage.data?.description.split(`/`)[0]}
-                  </Box>
-               </Stack>
-               <Stack
-                  sx={{
-                     flexDirection: `row`,
-                     gap: `10px`,
-                     alignItems: `center`,
-                     justifyContent: `center`,
-                  }}
-               >
-                  <EmailRoundedIcon sx={{ fontSize: `18px`, color: `rgba(255,255,255, 0.5)` }} />
-                  <Box
-                     sx={{
-                        "textDecoration": `none`,
-                        "color": `white`,
-                        "&:hover": { color: `#69b1ff` },
-                        "transition": `color .3s`,
-                        "fontSize": `14px`,
-                     }}
-                     component={`a`}
-                     href={`mailto:${dataTextInPage.data?.description.split(`/`)[1]}`}
-                  >
-                     {dataTextInPage.data?.description.split(`/`)[1]}
-                  </Box>
-               </Stack>
-            </Stack>
+                  <Stack gap="6px" sx={{ justifyContent: `center` }}>
+                     {phoneInfo && (
+                        <Stack direction="row" gap="10px" alignItems="center">
+                           <LocalPhoneRoundedIcon sx={{ fontSize: `18px`, color: `rgba(255, 255, 255, 0.6)` }} />
+                           <Box
+                              component="a"
+                              href={`tel:${phoneInfo.replace(/\s+/g, '')}`}
+                              sx={{
+                                 color: `rgba(255, 255, 255, 0.9)`,
+                                 textDecoration: `none`,
+                                 fontSize: `14px`,
+                                 fontWeight: `500`,
+                                 transition: `color 0.2s ease`,
+                                 "&:hover": { color: `#b388ff` },
+                              }}
+                           >
+                              {phoneInfo}
+                           </Box>
+                        </Stack>
+                     )}
+
+                     {emailInfo && (
+                        <Stack direction="row" gap="10px" alignItems="center">
+                           <EmailRoundedIcon sx={{ fontSize: `18px`, color: `rgba(255, 255, 255, 0.6)` }} />
+                           <Box
+                              component="a"
+                              href={`mailto:${emailInfo}`}
+                              sx={{
+                                 color: `rgba(255, 255, 255, 0.9)`,
+                                 textDecoration: `none`,
+                                 fontSize: `14px`,
+                                 fontWeight: `500`,
+                                 transition: `color 0.2s ease`,
+                                 "&:hover": { color: `#b388ff` },
+                              }}
+                           >
+                              {emailInfo}
+                           </Box>
+                        </Stack>
+                     )}
+                  </Stack>
+               </>
+            )}
          </Stack>
       </Stack>
    );
 }
+
 export default FormContact;

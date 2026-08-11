@@ -4,7 +4,9 @@ import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import VerticalSplitRoundedIcon from "@mui/icons-material/VerticalSplitRounded";
 import { ROUTER } from "./router.constant";
 import WorkspacePremiumRoundedIcon from "@mui/icons-material/WorkspacePremiumRounded";
+import CodeRoundedIcon from "@mui/icons-material/CodeRounded";
 import SchoolRoundedIcon from "@mui/icons-material/SchoolRounded";
+
 
 export const LIST_NAV = [
    {
@@ -12,6 +14,12 @@ export const LIST_NAV = [
       path: ROUTER.ADMIN.ABOUT,
       icon: <PersonRoundedIcon />,
       childrens: [
+         {
+            title: `Skills`,
+            path: ROUTER.ADMIN.SKILL,
+            icon: <CodeRoundedIcon />,
+            childrens: [],
+         },
          {
             title: `Certifications`,
             path: ROUTER.ADMIN.CERTIFICATION,

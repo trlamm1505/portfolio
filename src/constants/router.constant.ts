@@ -8,7 +8,7 @@ export const ROUTER = {
          LOGIN: `/admin/login`,
          REGISTER: `/admin/register`,
       },
-      HOME: `/admin/`,
+      HOME: `/admin/login`,
       DASHBOARD: `/admin/dashboard`,
       ABOUT: `/admin/about`,
       MY_PROJECT: `/admin/my-project`,
@@ -16,5 +16,6 @@ export const ROUTER = {
       TEXT_IN_PAGE: `/admin/text-in-page`,
       CERTIFICATION: `/admin/certification`,
       EDUCATION: `/admin/education`,
+      SKILL: `/admin/skill`,
    },
 };

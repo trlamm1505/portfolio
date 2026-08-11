@@ -52,7 +52,7 @@ export const sentenceVariant = {
   animate: {
     opacity: 1,
     transition: {
-      delayChildren: 0.7,
+      delayChildren: 1.4,
       staggerChildren: 0.02,
       
     },

@@ -27,7 +27,13 @@ export const getTextInPageByPageAction = async (
    try {
       await MongooseClient();
 
-      const textInPage = await TextInPages.findOne({ page: page }).lean();
+      // Support matching page with or without leading slash, e.g. "/" & "home", "/about" & "about"
+      const cleanPage = page.replace(/^\//, "");
+      const searchPages = Array.from(
+         new Set([page, cleanPage, `/${cleanPage}`, page === "/" ? "home" : "", page === "/" ? "Home" : ""].filter(Boolean))
+      );
+
+      const textInPage = await TextInPages.findOne({ page: { $in: searchPages } }).lean();
 
       return responAction(true, textInPage as any, `successfuly`);
    } catch (error: any) {

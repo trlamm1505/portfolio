@@ -1,23 +1,25 @@
-import { useCallback } from "react";
-import Particles from "react-tsparticles";
-import { Engine } from "tsparticles-engine";
-import { loadPolygonPath } from "tsparticles-path-polygon";
+import { useEffect, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { Engine } from "@tsparticles/engine";
+import { loadPolygonPath } from "@tsparticles/path-polygon";
 
 function ParticlesPolygon() {
-    // init
-    const particlesInit = useCallback(async (engine: Engine) => {
+    const [init, setInit] = useState(false);
 
-        await loadPolygonPath(engine);
+    useEffect(() => {
+        initParticlesEngine(async (engine: Engine) => {
+            await loadPolygonPath(engine);
+        }).then(() => {
+            setInit(true);
+        });
     }, []);
 
-    const particlesLoaded = useCallback(async () => {}, []);
+    if (!init) return null;
 
     return (
         <Particles
             className="w-full h-full absolute top-0 left-0 translate-z-0"
             id="ParticlesPolygon"
-            init={particlesInit}
-            loaded={particlesLoaded}
             options={{
                 fullScreen: { enable: false, zIndex: -10 },
                 background: {

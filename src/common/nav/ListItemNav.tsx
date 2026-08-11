@@ -36,18 +36,41 @@ export default function ListItemNav({ item, pl }: TProps) {
       }
    };
 
+   const isSelected = pathname === item.path;
+
    return (
       <>
-         <ListItemButton selected={pathname === item.path} onClick={handleClick} sx={{ pl: pl }}>
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.title} />
+         <ListItemButton
+            selected={isSelected}
+            onClick={handleClick}
+            sx={{
+               pl: pl,
+               borderRadius: "12px",
+               mb: 0.8,
+               transition: "all 0.2s ease",
+               color: "#4c3a6b",
+               "&.Mui-selected": {
+                  backgroundColor: "#ebdffa",
+                  borderLeft: "4px solid #8b5cf6",
+                  "& .MuiListItemIcon-root": { color: "#8b5cf6" },
+                  "& .MuiListItemText-primary": { color: "#5b21b6", fontWeight: 700 },
+               },
+               "&:hover": {
+                  backgroundColor: "#f3eefc",
+               },
+            }}
+         >
+            <ListItemIcon sx={{ minWidth: 36, color: isSelected ? "#8b5cf6" : "#7c689c" }}>
+               {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.title} primaryTypographyProps={{ fontSize: "14px", fontWeight: isSelected ? 700 : 500 }} />
             {item.childrens.length > 0 && (
-               <NavigateNextIcon sx={{ rotate: !open ? `0deg` : `90deg`, transition: `all .3s` }} />
+               <NavigateNextIcon sx={{ rotate: !open ? `0deg` : `90deg`, transition: `all .3s`, fontSize: "18px", color: "#9ca3af" }} />
             )}
          </ListItemButton>
          {item.childrens.length > 0 && (
             <Collapse in={open} timeout="auto" unmountOnExit>
-               <List>
+               <List disablePadding>
                   {item.childrens.map((children: any, index: number) => {
                      const plNext = pl + 2;
                      return (

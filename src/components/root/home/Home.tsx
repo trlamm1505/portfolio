@@ -12,23 +12,56 @@ import { Box, Button, Container, Stack, Typography, useColorScheme } from "@mui/
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getTextInPageAction } from "@/actions/title-in-page.action";
 
 const basePath = `/images/home/`;
 
 type TProps = {
    dataTextInPage: TResonAction<TTextInPage | null>;
+   allTextInPage?: TResonAction<TTextInPage[] | null>;
 };
 
-export default function Home({ dataTextInPage }: TProps) {
+export default function Home({ dataTextInPage, allTextInPage }: TProps) {
    const { mode, setMode } = useColorScheme();
+   const [dynamicCvUrl, setDynamicCvUrl] = useState<string>(URL_CV);
+
    useEffect(() => {
-      if (mode === `dark`) return;
-      setMode(`dark`);
-   }, [mode, setMode]);
+      if (mode !== `dark`) {
+         setMode(`dark`);
+      }
+
+      // 1. Try resolving CV URL from initial server props
+      const initialItems = allTextInPage?.data || [];
+      const initialCvItem = initialItems.find(
+         (i) =>
+            i.title.toLowerCase().includes("cv") ||
+            i.title.toLowerCase().includes("resume") ||
+            i.page.toLowerCase().includes("cv")
+      );
+      if (initialCvItem && initialCvItem.description?.trim()) {
+         setDynamicCvUrl(initialCvItem.description.trim());
+      }
+
+      // 2. Fetch latest from database to ensure fresh link
+      getTextInPageAction().then((res) => {
+         if (res.status && res.data) {
+            const items = res.data;
+            const cvItem = items.find(
+               (i) =>
+                  i.title.toLowerCase().includes("cv") ||
+                  i.title.toLowerCase().includes("resume") ||
+                  i.page.toLowerCase().includes("cv")
+            );
+            if (cvItem && cvItem.description?.trim()) {
+               setDynamicCvUrl(cvItem.description.trim());
+            }
+         }
+      });
+   }, [mode, setMode, allTextInPage]);
 
    const handleDownloadCv = () => {
-      window.open(URL_CV, "_blank");
+      window.open(dynamicCvUrl, "_blank");
    };
 
    console.log(dataTextInPage);
@@ -48,8 +81,8 @@ export default function Home({ dataTextInPage }: TProps) {
                      whiteSpace: `pre`,
                      fontSize: "1.5rem",
                      lineHeight: "2",
-                     color: "hsla(0,0%,100%,.6)",
-                     fontWeight: "400",
+                     color: "rgba(255, 255, 255, 0.85)",
+                     fontWeight: "500",
                      fontFamily: `var(--font-sora)`,
                      marginRight: `10px`,
                   })}
@@ -58,10 +91,10 @@ export default function Home({ dataTextInPage }: TProps) {
                         WebkitTextFillColor: "transparent",
                         fontSize: "1.5rem",
                         lineHeight: "2",
-                        fontWeight: "700",
+                        fontWeight: "800",
                         background:
-                           "linear-gradient(300deg, rgba(255,248,0,1) 0%, rgba(241,48,36,1) 25%, rgba(255,248,0,1) 50%, rgba(241,48,36,1)  75%) 0% 0% / 400% text",
-                        filter: "drop-shadow(0px 3px 10px rgba(250, 221, 220, 0.5))",
+                           "linear-gradient(90deg, #e040fb 0%, #b388ff 50%, #ffffff 100%) 0% 0% / 200% text",
+                        filter: "drop-shadow(0px 2px 10px rgba(224, 64, 251, 0.6))",
                      }}
                      animate={{
                         backgroundPosition: ["0%", "100%"],
@@ -72,45 +105,69 @@ export default function Home({ dataTextInPage }: TProps) {
                         repeatType: "reverse",
                      }}
                   >
-                     VU LE BAO LONG
+                     TRAN QUOC LAM
                   </motion.span>
                </Typography>
 
-               <Typography
-                  variant="h2"
-                  sx={{
-                     filter: "drop-shadow(0px 3px 10px rgba(255, 255, 255, 0.8))",
-                  }}
-               >
-                  {effectText(dataTextInPage.data?.title.split("/")[0] || ``, {
-                     overflow: `hidden`,
-                     // whiteSpace: `pre`,
-                     marginTop: "1.25rem",
-                     fontSize: "60px",
-                     lineHeight: "1.3",
-                     fontWeight: "600",
-                  })}
+               {(() => {
+                  const rawTitle = dataTextInPage.data?.title || "Front End - Back End / Web & Mobile Developer";
+                  const hasSlash = rawTitle.includes("/");
+                  let line1 = "";
+                  let line2 = "";
 
-                  <br />
+                  if (hasSlash) {
+                     line1 = rawTitle.split("/")[0].trim();
+                     line2 = rawTitle.split("/")[1]?.trim() || "";
+                  } else if (rawTitle.includes("Web")) {
+                     const idx = rawTitle.indexOf("Web");
+                     line1 = rawTitle.substring(0, idx).trim();
+                     line2 = rawTitle.substring(idx).trim();
+                  } else {
+                     line1 = rawTitle;
+                  }
 
-                  {effectText(dataTextInPage.data?.title.split("/")[1] || ``, {
-                     overflow: `hidden`,
-                     // whiteSpace: `pre`,
-                     marginTop: "1.25rem",
-                     fontSize: "60px",
-                     lineHeight: "1.3",
-                     fontWeight: "600",
-                  })}
-               </Typography>
+                  return (
+                     <Typography
+                        variant="h2"
+                        sx={{
+                           color: "#ffffff",
+                           filter:
+                              "drop-shadow(0px 3px 12px rgba(0, 0, 0, 0.8)) drop-shadow(0px 0px 20px rgba(179, 136, 255, 0.45))",
+                        }}
+                     >
+                        {effectText(line1, {
+                           overflow: `hidden`,
+                           marginTop: "1.25rem",
+                           fontSize: "52px",
+                           lineHeight: "1.25",
+                           fontWeight: "700",
+                           color: "#ffffff",
+                        })}
+
+                        {line2 && <br />}
+
+                        {line2 &&
+                           effectText(line2, {
+                              overflow: `hidden`,
+                              marginTop: "1.25rem",
+                              fontSize: "52px",
+                              lineHeight: "1.25",
+                              fontWeight: "700",
+                              color: "#ffffff",
+                           })}
+                     </Typography>
+                  );
+               })()}
 
                {effectText(dataTextInPage.data?.description || ``, {
                   overflow: `hidden`,
                   marginTop: "2rem",
                   lineHeight: "1.8",
-                  fontSize: "16px",
+                  fontSize: "19px",
                   fontWeight: "300",
-                  maxWidth: "36rem",
-                  color: "hsla(0,0%,100%,.6)",
+                  maxWidth: "46rem",
+                  color: "hsla(0,0%,100%,.85)",
+                  filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.8))",
                })}
 
                <Button
@@ -118,79 +175,107 @@ export default function Home({ dataTextInPage }: TProps) {
                   variant="contained"
                   size="large"
                   sx={{
-                     "mt": "2rem",
-                     "filter": "drop-shadow(0px 3px 10px rgba(250, 221, 220, 0.3))",
+                     "mt": "3rem",
+                     "px": "34px",
+                     "py": "14px",
+                     "height": "56px",
+                     "fontSize": "18px",
+                     "fontWeight": "600",
+                     "filter": "drop-shadow(0px 4px 15px rgba(179, 136, 255, 0.5))",
                      "borderRadius": "999999px",
                      "textTransform": "capitalize",
                      "color": "white",
-                     "transition": "all 0.3s",
+                     "transition": "all 0.3s ease-in-out",
                      "background":
-                        "linear-gradient(60deg, rgba(241, 48, 36, 1) 50%, rgba(255, 248, 0, 1) 100%)",
+                        "linear-gradient(60deg, #7c4dff 0%, #b388ff 50%, #d1c4e9 100%)",
                      "&:active": {
                         transform: "translateY(1px)",
                      },
-                     "&:hover svg": {
-                        animation: "slide-top-bottom 1s forwards",
+                     "&:hover": {
+                        background:
+                           "linear-gradient(60deg, #651fff 0%, #7c4dff 50%, #b388ff 100%)",
+                        transform: "scale(1.05)",
                      },
                   }}
                >
-                  Download CV
+                  <Box
+                     component="span"
+                     sx={{
+                        display: "inline-block",
+                        transition: "all 0.3s ease-in-out",
+                        animation: "text-pulse-scale 2s ease-in-out infinite",
+                     }}
+                  >
+                     Download CV
+                  </Box>
                   <DownloadRoundedIcon
                      sx={{
-                        ml: "10px",
+                        ml: "12px",
+                        fontSize: "26px",
+                        animation: "slide-top-bottom 2s ease-in-out infinite",
                      }}
                   />
                </Button>
 
-               <Box
-                  sx={{
-                     "mt": "1.25rem",
-                     "position": "relative",
-                     "&:hover svg": {
-                        animation: "slide-left-right 1s forwards",
-                     },
+               <motion.div
+                  initial={{ y: -80, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{
+                     duration: 1.0,
+                     ease: [0.22, 1, 0.36, 1],
+                     delay: 1.8,
                   }}
                >
-                  <Image
-                     src={`${basePath}circle-star.svg`}
-                     width={148}
-                     height={150}
-                     alt="circle-start.svg"
-                     priority={true}
-                  />
-                  <Link
-                     href={"/project"}
-                     style={{
-                        position: "absolute",
-                        top: "0",
-                        left: "0",
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                  <Box
+                     sx={{
+                        "mt": "1.75rem",
+                        "position": "relative",
+                        "&:hover svg": {
+                           animation: "slide-left-right 1s forwards",
+                        },
                      }}
                   >
                      <Image
-                        src={`${basePath}rounded-text.png`}
-                        width={110}
-                        height={115}
-                        alt="rounded-text.png"
+                        src={`${basePath}circle-star.svg`}
+                        width={200}
+                        height={203}
+                        alt="circle-start.svg"
                         priority={true}
+                     />
+                     <Link
+                        href={"/project"}
                         style={{
-                           animation: "spin 10s linear infinite",
                            position: "absolute",
+                           top: "0",
+                           left: "0",
+                           width: "100%",
+                           height: "100%",
+                           display: "flex",
+                           justifyContent: "center",
+                           alignItems: "center",
                         }}
-                     />
+                     >
+                        <Image
+                           src={`${basePath}rounded-text.png`}
+                           width={150}
+                           height={155}
+                           alt="rounded-text.png"
+                           priority={true}
+                           style={{
+                              animation: "spin 5s linear infinite",
+                              position: "absolute",
+                           }}
+                        />
 
-                     <KeyboardDoubleArrowRightRoundedIcon
-                        sx={{
-                           color: "white",
-                           fontSize: "40px",
-                        }}
-                     />
-                  </Link>
-               </Box>
+                        <KeyboardDoubleArrowRightRoundedIcon
+                           sx={{
+                              color: "white",
+                              fontSize: "52px",
+                           }}
+                        />
+                     </Link>
+                  </Box>
+               </motion.div>
             </Stack>
          </Container>
 
@@ -219,9 +304,10 @@ export default function Home({ dataTextInPage }: TProps) {
                   verticalAlign: "middle",
                   position: "absolute",
                   objectFit: "cover",
-                  opacity: ".5",
+                  transform: "scale(1.15) translateY(-20px)",
+                  opacity: ".65",
                   mixBlendMode: "color-dodge",
-                  filter: "blur(5px)",
+                  filter: "hue-rotate(220deg) saturate(1.4) blur(4px)",
                }}
             />
 

@@ -5,18 +5,9 @@ import { TTextInPage } from "@/types/respon/text-in-page.type";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {
-   Box,
-   Button,
-   CircularProgress,
-   Drawer,
-   IconButton,
-   Stack,
-   TextField,
-   Typography,
-} from "@mui/material";
+import { Box, Button, Chip, Drawer, Stack, TextField, Typography } from "@mui/material";
 import { useFormik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 
@@ -29,6 +20,19 @@ type TProps = {
 const heightHeader = `70px`;
 const heightFooter = `80px`;
 
+const textFieldStyle = {
+   width: "100%",
+   "& .MuiInputLabel-root": { color: "#5b21b6" },
+   "& .MuiOutlinedInput-root": {
+      color: "#221638",
+      backgroundColor: "#fcfaff",
+      borderRadius: "12px",
+      "& fieldset": { borderColor: "#d4c2fc" },
+      "&:hover fieldset": { borderColor: "#8b5cf6" },
+      "&.Mui-focused fieldset": { borderColor: "#8b5cf6" },
+   },
+};
+
 export default function DrawerTextInPageEdit({
    openDrawerTextInPageEdit,
    handleCloseDrawerTextInPageEdit,
@@ -38,11 +42,10 @@ export default function DrawerTextInPageEdit({
    const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
 
    const editTextInPageForm = useFormik({
-      enableReinitialize: true,
       initialValues: {
-         page: dataTextInPageEdit.page,
-         title: dataTextInPageEdit.title,
-         description: dataTextInPageEdit.description,
+         page: ``,
+         title: ``,
+         description: ``,
       },
       validationSchema: Yup.object().shape({
          page: Yup.string().trim().required(`Page is required`),
@@ -50,8 +53,7 @@ export default function DrawerTextInPageEdit({
          description: Yup.string().trim().required(`Description is required`),
       }),
       onSubmit: async (valuesRaw) => {
-         console.log(`valuesRaw`, valuesRaw);
-
+         if (!dataTextInPageEdit) return;
          setLoading(true);
 
          const payload: TTextInPage = {
@@ -61,19 +63,25 @@ export default function DrawerTextInPageEdit({
             title: valuesRaw.title,
          };
 
-         console.log(payload);
-
          const result = await updateTextInPageAction(payload);
-         console.log(result);
          setLoading(false);
 
          if (!result.status) return toast.error(result.message);
 
          handleCloseDrawerTextInPageEdit();
-
          toast.success(result.message);
       },
    });
+
+   useEffect(() => {
+      if (dataTextInPageEdit) {
+         editTextInPageForm.setValues({
+            page: dataTextInPageEdit.page || ``,
+            title: dataTextInPageEdit.title || ``,
+            description: dataTextInPageEdit.description || ``,
+         });
+      }
+   }, [dataTextInPageEdit]);
 
    const handleDeleteTextInPage = async () => {
       setLoadingDelete(true);
@@ -94,6 +102,13 @@ export default function DrawerTextInPageEdit({
          anchor={`right`}
          open={openDrawerTextInPageEdit}
          onClose={handleCloseDrawerTextInPageEdit}
+         PaperProps={{
+            sx: {
+               backgroundColor: "#ffffff",
+               color: "#221638",
+               boxShadow: "-10px 0 40px rgba(139, 92, 246, 0.15)",
+            },
+         }}
       >
          <Box
             sx={{ width: { xs: `90vw`, lg: `500px` }, position: `relative`, height: `100%` }}
@@ -108,40 +123,100 @@ export default function DrawerTextInPageEdit({
                   height: `${heightHeader}`,
                   alignItems: `center`,
                   justifyContent: `space-between`,
-                  p: `20px 20px 10px`,
+                  p: `20px 24px 10px`,
                   flexDirection: `row`,
+                  borderBottom: `1px solid #e7ddfa`,
                }}
             >
-               <Typography sx={{ fontSize: `20px`, fontWeight: `700` }}>
-                  <span>Edit Text In Page </span>
-                  <span style={{ fontWeight: `400`, fontSize: `14px` }}>
-                     - {dataTextInPageEdit._id.toString()}
-                  </span>
+               <Typography sx={{ fontSize: `22px`, fontWeight: `800`, color: "#3b1874" }}>
+                  Edit Text In Page
                </Typography>
-               <IconButton
-                  disabled={loadingDelete}
-                  color="error"
-                  size="large"
+               <LoadingButton
                   onClick={handleDeleteTextInPage}
+                  loading={loadingDelete}
+                  loadingPosition="end"
+                  endIcon={<DeleteRoundedIcon />}
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  sx={{ borderRadius: "10px", textTransform: "none", fontWeight: 600 }}
                >
-                  {loadingDelete ? <CircularProgress size={20} /> : <DeleteRoundedIcon />}
-               </IconButton>
+                  Delete
+               </LoadingButton>
             </Stack>
 
             {/* body */}
             <Stack
                sx={{
                   height: `calc(100vh - (${heightHeader} + ${heightFooter}))`,
-                  p: `10px 20px`,
+                  p: `24px`,
                   rowGap: `20px`,
                   overflowY: `auto`,
                }}
             >
+               {/* Quick Social Presets */}
+               <Box sx={{ mb: 0.5 }}>
+                  <Typography variant="caption" fontWeight="700" color="#7c3aed" display="block" mb={1}>
+                     ⚡ Quick Presets for Social Links:
+                  </Typography>
+                  <Stack direction="row" flexWrap="wrap" gap={1}>
+                     <Chip
+                        label="🐙 GitHub"
+                        size="small"
+                        onClick={() => {
+                           editTextInPageForm.setFieldValue("page", "social");
+                           editTextInPageForm.setFieldValue("title", "GitHub");
+                           editTextInPageForm.setFieldValue("description", "https://github.com/trlamm1505");
+                        }}
+                        sx={{ backgroundColor: "#f3eefc", color: "#6c2bd9", fontWeight: 600, cursor: "pointer" }}
+                     />
+                     <Chip
+                        label="📘 Facebook"
+                        size="small"
+                        onClick={() => {
+                           editTextInPageForm.setFieldValue("page", "social");
+                           editTextInPageForm.setFieldValue("title", "Facebook");
+                           editTextInPageForm.setFieldValue("description", "https://www.facebook.com/Suduy.1505");
+                        }}
+                        sx={{ backgroundColor: "#e7f3ff", color: "#1877f2", fontWeight: 600, cursor: "pointer" }}
+                     />
+                     <Chip
+                        label="💼 LinkedIn"
+                        size="small"
+                        onClick={() => {
+                           editTextInPageForm.setFieldValue("page", "social");
+                           editTextInPageForm.setFieldValue("title", "LinkedIn");
+                           editTextInPageForm.setFieldValue("description", "https://www.linkedin.com/in/tqlam150504/");
+                        }}
+                        sx={{ backgroundColor: "#e8f4f9", color: "#0a66c2", fontWeight: 600, cursor: "pointer" }}
+                     />
+                     <Chip
+                        label="📄 CV Resume"
+                        size="small"
+                        onClick={() => {
+                           editTextInPageForm.setFieldValue("page", "social");
+                           editTextInPageForm.setFieldValue("title", "CV Resume");
+                           editTextInPageForm.setFieldValue("description", "https://drive.google.com/file/d/1d9jTYRwv09XPlU8oDDXFuvfZ-jVsLG4Q/view?usp=sharing");
+                        }}
+                        sx={{ backgroundColor: "#fce8e6", color: "#ea4335", fontWeight: 600, cursor: "pointer" }}
+                     />
+                  </Stack>
+               </Box>
+
                {/* page */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   autoComplete="page"
-                  label="Page"
+                  label="Page Route (e.g. / or /about or /contact)"
                   name="page"
                   value={editTextInPageForm.values.page}
                   onChange={editTextInPageForm.handleChange}
@@ -152,7 +227,16 @@ export default function DrawerTextInPageEdit({
 
                {/* title */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   autoComplete="title"
                   label="Title"
                   name="title"
@@ -167,9 +251,18 @@ export default function DrawerTextInPageEdit({
 
                {/* description */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   multiline
-                  rows={10}
+                  rows={8}
                   autoComplete="description"
                   label="Description"
                   name="description"
@@ -191,11 +284,16 @@ export default function DrawerTextInPageEdit({
                sx={{
                   height: `${heightFooter}`,
                   flexDirection: `row`,
-                  p: `10px 20px 20px`,
-                  gap: `20px`,
+                  p: `10px 24px 20px`,
+                  gap: `16px`,
+                  borderTop: `1px solid #e7ddfa`,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                }}
             >
-               <Button onClick={handleCloseDrawerTextInPageEdit}>Cancel</Button>
+               <Button onClick={handleCloseDrawerTextInPageEdit} sx={{ color: "#634e8c", fontWeight: 600, textTransform: "none" }}>
+                  Cancel
+               </Button>
 
                <LoadingButton
                   onClick={() => {
@@ -206,8 +304,17 @@ export default function DrawerTextInPageEdit({
                   endIcon={<SendRoundedIcon sx={{ fontSize: `16px !important` }} />}
                   variant="contained"
                   size="large"
+                  sx={{
+                     borderRadius: "12px",
+                     background: "linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%)",
+                     color: "#ffffff",
+                     fontWeight: "700",
+                     textTransform: "none",
+                     px: 3,
+                     boxShadow: "0 6px 20px rgba(139, 92, 246, 0.3)",
+                  }}
                >
-                  Edit
+                  Update Text
                </LoadingButton>
             </Stack>
          </Box>

@@ -21,19 +21,54 @@ const projectSchema = new mongoose.Schema(
       type: {
          type: Schema.ObjectId,
          ref: TypeProjects.modelName,
-         required: true,
+         required: false,
       },
       platform: {
          type: String,
-         required: true,
+         required: false,
+         default: "",
+      },
+      company_name: {
+         type: String,
+         default: "",
+      },
+      location: {
+         type: String,
+         default: "",
+      },
+      date_range: {
+         type: String,
+         default: "",
+      },
+      category: {
+         type: String,
+         default: "Work Experience",
+      },
+      link: {
+         type: String,
+         default: "",
+      },
+      github_link: {
+         type: String,
+         default: "",
+      },
+      demo_link: {
+         type: String,
+         default: "",
+      },
+      technologies: {
+         type: [String],
+         default: [],
       },
       img_project_name: {
          type: String,
-         required: true,
+         required: false,
+         default: "",
       },
       img_logo_name: {
          type: String,
-         required: true,
+         required: false,
+         default: "",
       },
    },
    {
@@ -42,8 +77,11 @@ const projectSchema = new mongoose.Schema(
    }
 );
 
-// Export the model
-const Projects =
-   mongoose.models[`${DOCUMENT_NAME}`] || mongoose.model(DOCUMENT_NAME, projectSchema);
+// Always clear cached model in development to prevent stale schema validation errors
+if (mongoose.models[DOCUMENT_NAME]) {
+   delete mongoose.models[DOCUMENT_NAME];
+}
+
+const Projects = mongoose.model(DOCUMENT_NAME, projectSchema);
 
 export default Projects;

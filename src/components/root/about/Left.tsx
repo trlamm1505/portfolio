@@ -14,32 +14,52 @@ export default function Left({ data, dataTextInPage }: TProps) {
    const daysDiff = dayjs().diff(data.created_at, "days");
    const yearsDiff = dayjs().diff(data.created_at, "years");
    const totalRepo = data.public_repos;
+   const rawTitle = dataTextInPage.data?.title || "About / me.";
+   const hasSlash = rawTitle.includes("/");
+   let titlePart1 = "";
+   let titlePart2 = "";
+   if (hasSlash) {
+      titlePart1 = rawTitle.split("/")[0];
+      titlePart2 = rawTitle.split("/")[1];
+   } else {
+      const lastSpace = rawTitle.lastIndexOf(" ");
+      if (lastSpace !== -1) {
+         titlePart1 = rawTitle.substring(0, lastSpace);
+         titlePart2 = rawTitle.substring(lastSpace + 1);
+      } else {
+         titlePart1 = rawTitle;
+         titlePart2 = "";
+      }
+   }
+
    return (
       <>
          <Typography
             variant="h1"
             sx={{
-               fontSize: `54px`,
-               fontWeight: `600`,
+               fontSize: `64px`,
+               fontWeight: `700`,
             }}
          >
-            {dataTextInPage.data?.title.split("/")[0]}{" "}
-            <Box
-               sx={{
-                  color: `#f44336`,
-               }}
-               component={`span`}
-            >
-               {dataTextInPage.data?.title.split("/")[1]}
-            </Box>
+            {titlePart1}{" "}
+            {titlePart2 && (
+               <Box
+                  sx={{
+                     color: `#b388ff`,
+                  }}
+                  component={`span`}
+               >
+                  {titlePart2}
+               </Box>
+            )}
          </Typography>
 
          <Typography
             sx={{
-               color: "hsla(0,0%,100%,.6)",
-               fontSize: `16px`,
+               color: "rgba(255, 255, 255, 0.75)",
+               fontSize: `18px`,
                lineHeight: `1.8`,
-               mt: `16px`,
+               mt: `32px`,
             }}
          >
             {dataTextInPage.data?.description}
@@ -47,7 +67,7 @@ export default function Left({ data, dataTextInPage }: TProps) {
 
          <Stack
             sx={{
-               mt: `48px`,
+               mt: `60px`,
                flexDirection: `row`,
                alignItems: `stretch`,
                justifyContent: `space-between`,
@@ -59,9 +79,9 @@ export default function Left({ data, dataTextInPage }: TProps) {
             <Stack gap={`.5rem`}>
                <Typography
                   sx={{
-                     color: `#f44336`,
-                     fontSize: `2.25rem`,
-                     lineHeight: `2.5rem`,
+                     color: `#b388ff`,
+                     fontSize: `2.75rem`,
+                     lineHeight: `3rem`,
                      fontWeight: `800`,
                   }}
                >
@@ -70,9 +90,11 @@ export default function Left({ data, dataTextInPage }: TProps) {
 
                <Typography
                   sx={{
-                     fontSize: `.75rem`,
+                     fontSize: `.85rem`,
                      letterSpacing: `1px`,
                      lineHeight: `1.4`,
+                     fontWeight: `500`,
+                     color: `rgba(255, 255, 255, 0.7)`,
                   }}
                >
                   YEARS OF <br /> EXPERIENCE
@@ -88,9 +110,9 @@ export default function Left({ data, dataTextInPage }: TProps) {
             <Stack gap={`.5rem`}>
                <Typography
                   sx={{
-                     color: `#f44336`,
-                     fontSize: `2.25rem`,
-                     lineHeight: `2.5rem`,
+                     color: `#b388ff`,
+                     fontSize: `2.75rem`,
+                     lineHeight: `3rem`,
                      fontWeight: `800`,
                   }}
                >
@@ -99,9 +121,11 @@ export default function Left({ data, dataTextInPage }: TProps) {
 
                <Typography
                   sx={{
-                     fontSize: `.75rem`,
+                     fontSize: `.85rem`,
                      letterSpacing: `1px`,
                      lineHeight: `1.4`,
+                     fontWeight: `500`,
+                     color: `rgba(255, 255, 255, 0.7)`,
                   }}
                >
                   DAYS OF <br /> EXPERIENCE
@@ -117,9 +141,9 @@ export default function Left({ data, dataTextInPage }: TProps) {
             <Stack gap={`.5rem`}>
                <Typography
                   sx={{
-                     color: `#f44336`,
-                     fontSize: `2.25rem`,
-                     lineHeight: `2.5rem`,
+                     color: `#b388ff`,
+                     fontSize: `2.75rem`,
+                     lineHeight: `3rem`,
                      fontWeight: `800`,
                   }}
                >
@@ -128,9 +152,11 @@ export default function Left({ data, dataTextInPage }: TProps) {
 
                <Typography
                   sx={{
-                     fontSize: `.75rem`,
+                     fontSize: `.85rem`,
                      letterSpacing: `1px`,
                      lineHeight: `1.4`,
+                     fontWeight: `500`,
+                     color: `rgba(255, 255, 255, 0.7)`,
                   }}
                >
                   TOTAL <br /> REPOSITORIES

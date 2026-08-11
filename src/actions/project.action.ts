@@ -40,6 +40,35 @@ export const getProjectsAction = async (): Promise<TResonAction<TProject[] | nul
    }
 };
 
+const resolveTypeId = async (typeInput?: string) => {
+   if (!typeInput || !typeInput.trim()) {
+      return undefined;
+   }
+
+   const trimmed = typeInput.trim();
+
+   if (/^[0-9a-fA-F]{24}$/.test(trimmed)) {
+      const existingById = await TypeProjects.findById(trimmed);
+      if (existingById) return existingById._id;
+   }
+
+   let existingType = await TypeProjects.findOne({
+      type: { $regex: new RegExp(`^${trimmed.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")}$`, "i") },
+   });
+
+   if (!existingType) {
+      existingType = await TypeProjects.create({ type: trimmed });
+   }
+
+   return existingType._id;
+};
+
+const parseTechnologies = (tech: string[] | string | undefined): string[] => {
+   if (!tech) return [];
+   if (Array.isArray(tech)) return tech.map((t) => t.trim()).filter(Boolean);
+   return tech.split(",").map((t) => t.trim()).filter(Boolean);
+};
+
 export const createProjectAction = async (
    payload: TPayloadProject,
    finallyCb?: () => void
@@ -47,7 +76,14 @@ export const createProjectAction = async (
    try {
       await MongooseClient();
 
-      const newProjects = await Projects.create(payload);
+      const typeId = await resolveTypeId(payload.type as any);
+      const technologiesArray = parseTechnologies(payload.technologies);
+
+      const newProjects = await Projects.create({
+         ...payload,
+         type: typeId,
+         technologies: technologiesArray,
+      });
 
       revalidatePath(`${ROUTER.PROJECT}`);
       revalidatePath(`${ROUTER.ADMIN.MY_PROJECT}`);
@@ -70,7 +106,17 @@ export const updateProjectAction = async (
    try {
       await MongooseClient();
 
-      const updateProjects = await Projects.updateOne({ _id: payload._id }, payload);
+      const typeId = await resolveTypeId(payload.type as any);
+      const technologiesArray = parseTechnologies(payload.technologies);
+
+      const updateProjects = await Projects.updateOne(
+         { _id: payload._id },
+         {
+            ...payload,
+            type: typeId,
+            technologies: technologiesArray,
+         }
+      );
 
       revalidatePath(`${ROUTER.PROJECT}`);
       revalidatePath(`${ROUTER.ADMIN.MY_PROJECT}`);

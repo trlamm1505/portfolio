@@ -13,7 +13,7 @@ export const getCertificationAction = async (): Promise<TResonAction<TCertificat
    try {
       await MongooseClient();
 
-      const certification = await Certifications.find().lean();
+      const certification = await Certifications.find().sort({ date: -1 }).lean();
 
       return responAction(true, certification as any, `successfuly`);
    } catch (error: any) {

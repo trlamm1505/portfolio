@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 import "../common/styles/card.scss";
 import "../common/styles/globals.css";
+import "animate.css";
 
 const interFont = Inter({
    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -24,18 +25,18 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
    metadataBase: new URL("http://localhost:3000/"),
    title: `${TITLE_BASE} | portfolio`,
-   description: "Web portfolio by developer long",
+   description: "Web portfolio by developer Tran Quoc Lam",
    openGraph: {
       title: `${TITLE_BASE} | portfolio`,
       images: ["/meta.png"],
-      description: "Web portfolio by developer long",
+      description: "Web portfolio by developer Tran Quoc Lam",
       url: "",
    },
    twitter: {
       images: ["/meta.png"],
       card: "summary_large_image",
       title: `${TITLE_BASE} | portfolio`,
-      description: "Web portfolio by developer long",
+      description: "Web portfolio by developer Tran Quoc Lam",
    },
    icons: {
       icon: "/favicon.ico",

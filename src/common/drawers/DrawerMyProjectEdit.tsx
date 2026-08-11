@@ -1,7 +1,8 @@
 "use client";
 
 import { deleteProjectAction, updateProjectAction } from "@/actions/project.action";
-import { FB_BASE, FB_FOLDER_LOGO, FB_FOLDER_PROJECT } from "@/constants/firebase.constant";
+import { getMediaUrl, FB_FOLDER_LOGO, FB_FOLDER_PROJECT } from "@/constants/firebase.constant";
+import { isFileSizeValid } from "@/helpers/function.helper";
 import { deleteWithFirebase, uploadWithFirebase } from "@/libs/firebase.lib";
 import { TPayloadEditProject, TProject, TTypeProject } from "@/types/respon/project.type";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -9,6 +10,7 @@ import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {
+   Autocomplete,
    Box,
    Button,
    CircularProgress,
@@ -23,7 +25,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import Image from "next/image";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import PreviewImage from "./PreviewImage";
@@ -62,29 +64,35 @@ export default function DrawerMyProjectEdit({
    const [fileImgLogo, setFileImgLogo] = useState<File | null>(null);
 
    const editProjectForm = useFormik({
-      enableReinitialize: true,
       initialValues: {
-         title: dataMyProjectEdit.title,
-         description: dataMyProjectEdit.description,
-         platform: dataMyProjectEdit.platform,
-         type: dataMyProjectEdit.type._id.toString(),
-         imgProject: dataMyProjectEdit.img_project_name,
-         imgLogo: dataMyProjectEdit.img_logo_name,
+         title: ``,
+         category: `Work Experience`,
+         company_name: ``,
+         location: ``,
+         date_range: ``,
+         github_link: ``,
+         demo_link: ``,
+         link: ``,
+         technologies: ``,
+         description: ``,
+         imgProject: ``,
+         imgLogo: ``,
       },
       validationSchema: Yup.object().shape({
          title: Yup.string().trim().required(`Name is required`),
          description: Yup.string().trim().required(`Description is required`),
-         platform: Yup.string().trim().required(`Platform is required`),
-         type: Yup.string().trim().required(`Type is required`),
-         imgProject: Yup.string().trim().required(`Image project is required`),
-         imgLogo: Yup.string().trim().required(`Image logo is required`),
       }),
       onSubmit: async (valuesRaw) => {
+         if (!dataMyProjectEdit) return;
          console.log(`valuesRaw`, valuesRaw);
 
          setLoading(true);
 
          if (fileImgProject) {
+            if (!isFileSizeValid(fileImgProject, 10)) {
+               setLoading(false);
+               return toast.warning("Project image file size > 10MB");
+            }
             const imgProjectName = await uploadWithFirebase(fileImgProject, FB_FOLDER_PROJECT);
             if (imgProjectName) {
                deleteWithFirebase(dataMyProjectEdit.img_project_name, FB_FOLDER_PROJECT);
@@ -95,6 +103,10 @@ export default function DrawerMyProjectEdit({
          }
 
          if (fileImgLogo) {
+            if (!isFileSizeValid(fileImgLogo, 10)) {
+               setLoading(false);
+               return toast.warning("Logo image file size > 10MB");
+            }
             const imgLogoName = await uploadWithFirebase(fileImgLogo, FB_FOLDER_LOGO);
             if (imgLogoName) {
                deleteWithFirebase(dataMyProjectEdit.img_logo_name, FB_FOLDER_LOGO);
@@ -107,11 +119,17 @@ export default function DrawerMyProjectEdit({
          const payload: TPayloadEditProject = {
             _id: dataMyProjectEdit._id,
             description: valuesRaw.description,
-            img_logo_name: valuesRaw.imgLogo,
-            img_project_name: valuesRaw.imgProject,
-            platform: valuesRaw.platform,
+            category: valuesRaw.category,
+            company_name: valuesRaw.company_name,
+            location: valuesRaw.location,
+            date_range: valuesRaw.date_range,
+            github_link: valuesRaw.github_link,
+            demo_link: valuesRaw.demo_link || "",
+            link: valuesRaw.demo_link || "",
+            technologies: valuesRaw.technologies,
+            img_logo_name: valuesRaw.imgLogo || dataMyProjectEdit.img_logo_name || "",
+            img_project_name: valuesRaw.imgProject || dataMyProjectEdit.img_project_name || "",
             title: valuesRaw.title,
-            type: valuesRaw.type,
          };
 
          const result = await updateProjectAction(payload);
@@ -151,11 +169,43 @@ export default function DrawerMyProjectEdit({
       toast.success(reuslt.message);
    };
 
+   useEffect(() => {
+      if (dataMyProjectEdit) {
+         const gitLink = (dataMyProjectEdit.github_link || "").trim();
+         const rawDemoLink = (dataMyProjectEdit.demo_link || dataMyProjectEdit.link || "").trim();
+         const cleanDemoLink = rawDemoLink !== gitLink ? rawDemoLink : "";
+
+         editProjectForm.setValues({
+            title: dataMyProjectEdit.title || ``,
+            category: dataMyProjectEdit.category || `Work Experience`,
+            company_name: dataMyProjectEdit.company_name || ``,
+            location: dataMyProjectEdit.location || ``,
+            date_range: dataMyProjectEdit.date_range || ``,
+            github_link: dataMyProjectEdit.github_link || ``,
+            demo_link: cleanDemoLink,
+            link: cleanDemoLink,
+            technologies: Array.isArray(dataMyProjectEdit.technologies)
+               ? dataMyProjectEdit.technologies.join(", ")
+               : dataMyProjectEdit.technologies || ``,
+            description: dataMyProjectEdit.description || ``,
+            imgProject: dataMyProjectEdit.img_project_name || ``,
+            imgLogo: dataMyProjectEdit.img_logo_name || ``,
+         });
+      }
+   }, [dataMyProjectEdit]);
+
    return (
       <Drawer
          anchor={`right`}
          open={openDrawerMyProjectEdit}
          onClose={handleCloseDrawerMyProjectEdit}
+         PaperProps={{
+            sx: {
+               backgroundColor: "#ffffff",
+               color: "#221638",
+               boxShadow: "-10px 0 40px rgba(139, 92, 246, 0.15)",
+            },
+         }}
       >
          <Box
             sx={{ width: { xs: `90vw`, lg: `500px` }, position: `relative`, height: `100%` }}
@@ -199,9 +249,41 @@ export default function DrawerMyProjectEdit({
                   overflowY: `auto`,
                }}
             >
+               {/* Project Category (AT THE VERY TOP) */}
+               <TextField
+                  select
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 600,
+                     },
+                  }}
+                  label="Project Category"
+                  name="category"
+                  value={editProjectForm.values.category}
+                  onChange={editProjectForm.handleChange}
+                  variant="outlined"
+               >
+                  <MenuItem value="Work Experience">💼 Work Experience</MenuItem>
+                  <MenuItem value="Personal Projects">🚀 Personal Projects</MenuItem>
+               </TextField>
+
                {/* title */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   autoComplete="title"
                   label="Title"
                   name="title"
@@ -214,45 +296,96 @@ export default function DrawerMyProjectEdit({
                   variant="outlined"
                />
 
-               {/* platform */}
+               {/* company_name (Tag 1) */}
                <TextField
-                  sx={{ width: `100%` }}
-                  autoComplete="platform"
-                  label="Platform"
-                  name="platform"
-                  value={editProjectForm.values.platform}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Tag / Sub-title 1 (e.g. Capstone Project, ILA Vietnam)"
+                  name="company_name"
+                  value={editProjectForm.values.company_name}
                   onChange={editProjectForm.handleChange}
-                  error={
-                     editProjectForm.touched.platform &&
-                     editProjectForm.errors.platform !== undefined
-                  }
-                  helperText={editProjectForm.touched.platform && editProjectForm.errors.platform}
                   variant="outlined"
                />
 
-               {/* type */}
+               {/* location (Tag 2) */}
                <TextField
-                  sx={{ width: `100%` }}
-                  select
-                  label="Type"
-                  name="type"
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Tag / Sub-title 2 (e.g. Front-end Developer, Ho Chi Minh City)"
+                  name="location"
+                  value={editProjectForm.values.location}
                   onChange={editProjectForm.handleChange}
-                  value={editProjectForm.values.type}
-                  error={editProjectForm.touched.type && editProjectForm.errors.type !== undefined}
-                  helperText={editProjectForm.touched.type && editProjectForm.errors.type}
-               >
-                  {dataTypeProjects?.data?.map((option) => (
-                     <MenuItem key={option._id.toString()} value={option._id.toString()}>
-                        {option.type}
-                     </MenuItem>
-                  ))}
-               </TextField>
+                  variant="outlined"
+               />
 
-               {/* description */}
+               {/* date_range */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Date Range (e.g. Jan 2026 – Present)"
+                  name="date_range"
+                  value={editProjectForm.values.date_range}
+                  onChange={editProjectForm.handleChange}
+                  variant="outlined"
+               />
+
+               {/* technologies */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Technologies (comma separated, e.g. React Native, TypeScript, TanStack)"
+                  name="technologies"
+                  value={editProjectForm.values.technologies}
+                  onChange={editProjectForm.handleChange}
+                  variant="outlined"
+               />
+
+               {/* description (PLACED ABOVE LINK FIELDS) */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   multiline
-                  rows={10}
+                  rows={8}
                   autoComplete="description"
                   label="Description"
                   name="description"
@@ -263,8 +396,48 @@ export default function DrawerMyProjectEdit({
                      editProjectForm.errors.description !== undefined
                   }
                   helperText={
-                     editProjectForm.touched.description && editProjectForm.errors.description
+                     (editProjectForm.touched.description &&
+                        editProjectForm.errors.description) ||
+                     "Max 10 lines: 1 summary paragraph line + up to 9 bullet points starting with •"
                   }
+                  variant="outlined"
+               />
+
+               {/* GitHub Link */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="GitHub Link (e.g. https://github.com/...)"
+                  name="github_link"
+                  value={editProjectForm.values.github_link}
+                  onChange={editProjectForm.handleChange}
+                  variant="outlined"
+               />
+
+               {/* Demo Link */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Live Demo Link (e.g. https://my-app.vercel.app)"
+                  name="demo_link"
+                  value={editProjectForm.values.demo_link}
+                  onChange={editProjectForm.handleChange}
                   variant="outlined"
                />
 
@@ -311,7 +484,7 @@ export default function DrawerMyProjectEdit({
                         overflow={"hidden"}
                      >
                         <Image
-                           src={`${FB_BASE}${FB_FOLDER_PROJECT}%2F${dataMyProjectEdit.img_project_name}?alt=media`}
+                           src={getMediaUrl(FB_FOLDER_PROJECT, dataMyProjectEdit.img_project_name)}
                            alt="preview"
                            width={0}
                            height={0}
@@ -379,7 +552,7 @@ export default function DrawerMyProjectEdit({
                         overflow={"hidden"}
                      >
                         <Image
-                           src={`${FB_BASE}${FB_FOLDER_LOGO}%2F${dataMyProjectEdit.img_logo_name}?alt=media`}
+                           src={getMediaUrl(FB_FOLDER_LOGO, dataMyProjectEdit.img_logo_name)}
                            alt="preview"
                            width={0}
                            height={0}
@@ -408,11 +581,16 @@ export default function DrawerMyProjectEdit({
                sx={{
                   height: `${heightFooter}`,
                   flexDirection: `row`,
-                  p: `10px 20px 20px`,
-                  gap: `20px`,
+                  p: `10px 24px 20px`,
+                  gap: `16px`,
+                  borderTop: `1px solid #e7ddfa`,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                }}
             >
-               <Button onClick={handleCloseDrawerMyProjectEdit}>Cancel</Button>
+               <Button onClick={handleCloseDrawerMyProjectEdit} sx={{ color: "#634e8c", fontWeight: 600, textTransform: "none" }}>
+                  Cancel
+               </Button>
 
                <LoadingButton
                   onClick={() => {
@@ -423,8 +601,17 @@ export default function DrawerMyProjectEdit({
                   endIcon={<SendRoundedIcon sx={{ fontSize: `16px !important` }} />}
                   variant="contained"
                   size="large"
+                  sx={{
+                     borderRadius: "12px",
+                     background: "linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%)",
+                     color: "#ffffff",
+                     fontWeight: "700",
+                     textTransform: "none",
+                     px: 3,
+                     boxShadow: "0 6px 20px rgba(139, 92, 246, 0.3)",
+                  }}
                >
-                  Edit
+                  Update Project
                </LoadingButton>
             </Stack>
          </Box>

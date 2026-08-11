@@ -1,23 +1,24 @@
-"use client";
-
-import { useCallback } from "react";
-import Particles from "react-tsparticles";
-import { Engine } from "tsparticles-engine";
-import { loadTrianglesPreset } from "tsparticles-preset-triangles";
+import { useEffect, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { Engine } from "@tsparticles/engine";
+import { loadTrianglesPreset } from "@tsparticles/preset-triangles";
 
 function ParticlesTriangles() {
-   // init
-   const particlesInit = useCallback(async (engine: Engine) => {
-      await loadTrianglesPreset(engine);
+   const [init, setInit] = useState(false);
+
+   useEffect(() => {
+      initParticlesEngine(async (engine: Engine) => {
+         await loadTrianglesPreset(engine);
+      }).then(() => {
+         setInit(true);
+      });
    }, []);
 
-   const particlesLoaded = useCallback(async () => {}, []);
+   if (!init) return null;
 
    return (
       <Particles
          id="ParticlesTriangles"
-         init={particlesInit}
-         loaded={particlesLoaded}
          options={{
             preset: "triangles",
             fullScreen: { enable: false, zIndex: -1 },
@@ -29,14 +30,14 @@ function ParticlesTriangles() {
             fpsLimit: 120,
             particles: {
                color: {
-                  value: "#e62e2e",
+                  value: "#b388ff",
                },
                links: {
-                  color: "#f59393",
-                  distance: 200,
+                  color: "#9575cd",
+                  distance: 220,
                   enable: true,
-                  opacity: 0.3,
-                  width: 1,
+                  opacity: 0.45,
+                  width: 1.2,
                },
                collisions: {
                   enable: true,
@@ -54,9 +55,10 @@ function ParticlesTriangles() {
                number: {
                   density: {
                      enable: true,
-                     area: 450,
+                     width: 1920,
+                     height: 1080,
                   },
-                  value: 20,
+                  value: 60,
                },
                opacity: {
                   value: 0.5,

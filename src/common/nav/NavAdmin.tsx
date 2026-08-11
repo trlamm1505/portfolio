@@ -26,14 +26,15 @@ export default function NavAdmin() {
          toast.error(result.message);
       }
    };
+
    return (
       <Stack
          sx={{
             width: WIDTH_NAV,
             height: `100%`,
-            borderStyle: `solid`,
-            borderColor: `rgba(var(--mui-palette-common-onBackgroundChannel) / 0.23)`,
-            borderWidth: `0px thin 0px 0px`,
+            backgroundColor: `#ffffff`,
+            borderRight: `1px solid #e5d8fa`,
+            boxShadow: `4px 0 20px rgba(139, 92, 246, 0.03)`,
          }}
       >
          <Stack
@@ -42,26 +43,42 @@ export default function NavAdmin() {
                width: `100%`,
                alignItems: `center`,
                justifyContent: `center`,
-               borderStyle: `solid`,
-               borderColor: `rgba(var(--mui-palette-common-onBackgroundChannel) / 0.23)`,
-               borderWidth: `0px 0px thin`,
+               borderBottom: `1px solid #e5d8fa`,
             }}
          >
-            <Logo />
+            <Logo color="#3b1874" />
          </Stack>
+
          {/* LIST NAV */}
-         <List sx={{ overflowY: `auto` }}>
+         <List sx={{ overflowY: `auto`, px: 1.5, py: 2 }}>
             <ListItemButton
                selected={pathname === ROUTER.ADMIN.DASHBOARD}
                onClick={() => {
                   router.push(ROUTER.ADMIN.DASHBOARD);
                }}
+               sx={{
+                  borderRadius: "12px",
+                  mb: 0.8,
+                  transition: "all 0.2s ease",
+                  color: "#4c3a6b",
+                  "&.Mui-selected": {
+                     backgroundColor: "#ebdffa",
+                     color: "#6c2bd9",
+                     borderLeft: "4px solid #8b5cf6",
+                     "& .MuiListItemIcon-root": { color: "#8b5cf6" },
+                     "& .MuiListItemText-primary": { color: "#5b21b6", fontWeight: 700 },
+                  },
+                  "&:hover": {
+                     backgroundColor: "#f3eefc",
+                  },
+               }}
             >
-               <ListItemIcon>
+               <ListItemIcon sx={{ minWidth: 38, color: "#7c689c" }}>
                   <GridViewRoundedIcon />
                </ListItemIcon>
-               <ListItemText primary={`Dashboard`} />
+               <ListItemText primary={`Dashboard`} primaryTypographyProps={{ fontSize: "14px", fontWeight: 500 }} />
             </ListItemButton>
+
             {LIST_NAV.map((item, index) => {
                return (
                   <Fragment key={index}>
@@ -70,14 +87,24 @@ export default function NavAdmin() {
                );
             })}
          </List>
+
          {/* FOOTER NAV */}
-         <List sx={{ mt: `auto`, flexShrink: `0` }}>
-            <Divider />
-            <ListItemButton onClick={handleLogout}>
-               <ListItemIcon>
+         <List sx={{ mt: `auto`, flexShrink: `0`, p: 1.5 }}>
+            <Divider sx={{ borderColor: `#e5d8fa`, mb: 1 }} />
+            <ListItemButton
+               onClick={handleLogout}
+               sx={{
+                  borderRadius: "12px",
+                  color: "#ef4444",
+                  "&:hover": {
+                     backgroundColor: "#fee2e2",
+                  },
+               }}
+            >
+               <ListItemIcon sx={{ minWidth: 38, color: "#ef4444" }}>
                   <LogoutRoundedIcon />
                </ListItemIcon>
-               <ListItemText primary="Logout" />
+               <ListItemText primary="Logout" primaryTypographyProps={{ fontSize: "14px", fontWeight: 600 }} />
             </ListItemButton>
          </List>
       </Stack>

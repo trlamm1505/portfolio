@@ -1,331 +1,35 @@
-import { Box, Stack, Typography } from "@mui/material";
-import { useState } from "react";
-import {
-   BiLogoBootstrap,
-   BiLogoCss3,
-   BiLogoDocker,
-   BiLogoFigma,
-   BiLogoGithub,
-   BiLogoHtml5,
-   BiLogoMongodb,
-   BiLogoNodejs,
-   BiLogoPython,
-   BiLogoRedux,
-   BiLogoTailwindCss,
-   BiLogoTypescript,
-   BiLogoVuejs,
-} from "react-icons/bi";
-import { BsGit } from "react-icons/bs";
-import { RiJavascriptFill, RiReactjsFill } from "react-icons/ri";
-import {
-   SiAdobephotoshop,
-   SiAdobepremierepro,
-   SiExpress,
-   SiMysql,
-   SiNestjs,
-   SiPostman,
-} from "react-icons/si";
-import { BsLink45Deg } from "react-icons/bs";
+"use client";
 
-import { FaDocker } from "react-icons/fa";
-import { TEducation } from "@/types/respon/education.type";
-import Education from "./Education";
+import { getMediaUrl, FB_FOLDER_SKILL } from "@/constants/firebase.constant";
 import { TCertification } from "@/types/respon/certification.type";
+import { TEducation } from "@/types/respon/education.type";
+import { TSkill } from "@/types/respon/skill.type";
+import { Box, Stack, Typography } from "@mui/material";
+import Image from "next/image";
+import { useState } from "react";
 import Certification from "./Certification";
-
-const items = [
-   {
-      title: `Skills`,
-      info: (
-         <Stack gap={`30px`}>
-            <Box>
-               <Typography
-                  sx={{
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                  }}
-               >
-                  Front-End Development
-               </Typography>
-               <Stack
-                  sx={{
-                     "flexWrap": `wrap`,
-                     "mt": `10px`,
-                     "flexDirection": `row`,
-                     "alignItems": `center`,
-                     "gap": `5px`,
-                     "& > svg": {
-                        fontSize: `50px`,
-                     },
-                  }}
-               >
-                  <BiLogoTypescript />
-                  <RiReactjsFill />
-                  <BiLogoVuejs />
-                  <BiLogoRedux />
-                  <RiJavascriptFill />
-                  <BiLogoTailwindCss />
-                  <BiLogoBootstrap />
-                  <BiLogoPython />
-                  <BiLogoHtml5 />
-                  <BiLogoCss3 />
-               </Stack>
-            </Box>
-
-            <Box>
-               <Typography
-                  sx={{
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                  }}
-               >
-                  Back-End Development
-               </Typography>
-               <Stack
-                  sx={{
-                     "flexWrap": `wrap`,
-                     "mt": `10px`,
-                     "flexDirection": `row`,
-                     "alignItems": `center`,
-                     "gap": `10px`,
-                     "& > svg": {
-                        fontSize: `50px`,
-                     },
-                  }}
-               >
-                  <BiLogoNodejs />
-                  <BiLogoMongodb />
-                  <SiNestjs />
-                  <SiExpress />
-                  <SiMysql />
-                  <FaDocker />
-               </Stack>
-            </Box>
-
-            <Box>
-               <Typography
-                  sx={{
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                  }}
-               >
-                  Tool
-               </Typography>
-               <Stack
-                  sx={{
-                     "flexWrap": `wrap`,
-                     "mt": `10px`,
-                     "flexDirection": `row`,
-                     "alignItems": `center`,
-                     "gap": `12px`,
-                     "& > svg": {
-                        fontSize: `40px`,
-                     },
-                  }}
-               >
-                  <SiPostman />
-                  <BiLogoFigma />
-                  <BiLogoGithub />
-                  <BsGit />
-                  <SiAdobephotoshop />
-                  <SiAdobepremierepro />
-               </Stack>
-            </Box>
-         </Stack>
-      ),
-   },
-   {
-      title: `Education`,
-      info: (
-         <Stack gap={`20px`}>
-            <Typography
-               sx={{
-                  color: "hsla(0,0%,100%,.6)",
-                  fontSize: `16px`,
-                  lineHeight: `2`,
-               }}
-            >
-               UIT - University of Information Technology
-               <br />
-               Bachelor Of Information Technology
-            </Typography>
-
-            <Typography
-               sx={{
-                  color: "hsla(0,0%,100%,.6)",
-                  fontSize: `16px`,
-                  lineHeight: `2`,
-               }}
-            >
-               HONG BANG International University
-               <br />
-               Bachelor Of Pharmacist - GPA: 2.83
-            </Typography>
-         </Stack>
-      ),
-   },
-   {
-      title: `Certifications`,
-      info: (
-         <Stack gap={`10px`}>
-            <Box>
-               <Typography
-                  sx={{
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                  }}
-               >
-                  Build Responsive Real-World Websites with HTML and CSS.
-               </Typography>
-               <Stack
-                  sx={{
-                     flexDirection: "row",
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                     alignItems: `center`,
-                  }}
-               >
-                  Date: 17/11/2022 -
-                  <BsLink45Deg fontSize={`20px`} />
-                  <Box
-                     sx={{
-                        textDecoration: `underline`,
-                        color: "hsla(0,0%,100%,.6)",
-                        display: `flex`,
-                        alignItems: `center`,
-                     }}
-                     component={`a`}
-                     target="_blank"
-                     href="https://www.udemy.com/certificate/UC-48949a43-a312-46e5-bfa9-412197951b45/"
-                  >
-                     Link
-                  </Box>
-               </Stack>
-            </Box>
-
-            <Box>
-               <Typography
-                  sx={{
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                  }}
-               >
-                  The Complete JavaScript Course 2023: From Zero to Expert.
-               </Typography>
-               <Stack
-                  sx={{
-                     flexDirection: "row",
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                     alignItems: `center`,
-                  }}
-               >
-                  Date: 04/02/2023 -
-                  <BsLink45Deg fontSize={`20px`} />
-                  <Box
-                     sx={{
-                        textDecoration: `underline`,
-                        color: "hsla(0,0%,100%,.6)",
-                        display: `flex`,
-                        alignItems: `center`,
-                     }}
-                     component={`a`}
-                     target="_blank"
-                     href="https://www.udemy.com/certificate/UC-e3493e49-be8a-4233-be46-6e7b6130e892/"
-                  >
-                     Link
-                  </Box>
-               </Stack>
-            </Box>
-
-            <Box>
-               <Typography
-                  sx={{
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                  }}
-               >
-                  Node.js, Express, MongoDB & More: The Complete Bootcamp 2023.
-               </Typography>
-               <Stack
-                  sx={{
-                     flexDirection: "row",
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                     alignItems: `center`,
-                  }}
-               >
-                  Date: 20/05/2023 -
-                  <BsLink45Deg fontSize={`20px`} />
-                  <Box
-                     sx={{
-                        textDecoration: `underline`,
-                        color: "hsla(0,0%,100%,.6)",
-                        display: `flex`,
-                        alignItems: `center`,
-                     }}
-                     component={`a`}
-                     target="_blank"
-                     href="https://www.udemy.com/certificate/UC-d1a1187f-a92e-41ca-85bd-2644aac70191/"
-                  >
-                     Link
-                  </Box>
-               </Stack>
-            </Box>
-
-            <Box>
-               <Typography
-                  sx={{
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                  }}
-               >
-                  Professional Front end Developer - Cybersoft Academy.
-               </Typography>
-               <Stack
-                  sx={{
-                     flexDirection: "row",
-                     color: "hsla(0,0%,100%,.6)",
-                     fontSize: `16px`,
-                     lineHeight: `2`,
-                     alignItems: `center`,
-                  }}
-               >
-                  Date: 18/09/2023 -
-                  <BsLink45Deg fontSize={`20px`} />
-                  <Box
-                     sx={{
-                        textDecoration: `underline`,
-                        color: "hsla(0,0%,100%,.6)",
-                        display: `flex`,
-                        alignItems: `center`,
-                     }}
-                     component={`a`}
-                     target="_blank"
-                     href="https://drive.google.com/file/d/1MuBoo5Mk6jsV_zuVxvxmAgbnDIS5MmdK/view?usp=drive_link"
-                  >
-                     Link
-                  </Box>
-               </Stack>
-            </Box>
-         </Stack>
-      ),
-   },
-];
+import Education from "./Education";
 
 type TProps = {
    dataEducations: TResonAction<TEducation[] | null>;
    dataCertification: TResonAction<TCertification[] | null>;
+   dataSkills?: TResonAction<TSkill[] | null>;
 };
-export default function Right({ dataEducations, dataCertification }: TProps) {
+
+const tabs = [
+   { title: "Skills" },
+   { title: "Education" },
+   { title: "Certifications" },
+];
+
+export default function Right({
+   dataEducations,
+   dataCertification,
+   dataSkills,
+}: TProps) {
    const [status, setStatus] = useState(0);
+
+   const skillsList = dataSkills?.data || [];
 
    return (
       <>
@@ -333,26 +37,35 @@ export default function Right({ dataEducations, dataCertification }: TProps) {
             sx={{
                width: `100%`,
                flexDirection: `row`,
-               alignItems: `baseline`,
-               gap: `50px`,
+               alignItems: `center`,
+               gap: `40px`,
                flexWrap: `wrap`,
+               borderBottom: `1px solid rgba(255, 255, 255, 0.1)`,
+               pb: `0px`,
             }}
          >
-            {items.map((item, index) => {
+            {tabs.map((tab, index) => {
+               const isActive = status === index;
                return (
                   <Typography
                      key={index}
+                     onClick={() => setStatus(index)}
                      sx={{
-                        fontSize: `22px`,
-                        fontWeight: `500`,
+                        fontSize: `20px`,
+                        fontWeight: isActive ? `600` : `500`,
                         cursor: `pointer`,
-                        color: status === index ? `#f44336` : `unset`,
-                     }}
-                     onClick={() => {
-                        setStatus(index);
+                        color: isActive ? `#b388ff` : `rgba(255, 255, 255, 0.7)`,
+                        position: `relative`,
+                        transition: `all 0.25s ease`,
+                        pb: `10px`,
+                        mb: `-1px`,
+                        borderBottom: isActive ? `3px solid #b388ff` : `3px solid transparent`,
+                        "&:hover": {
+                           color: `#b388ff`,
+                        },
                      }}
                   >
-                     {item.title}
+                     {tab.title}
                   </Typography>
                );
             })}
@@ -360,13 +73,113 @@ export default function Right({ dataEducations, dataCertification }: TProps) {
 
          <Box
             sx={{
-               mt: `30px`,
+               mt: `24px`,
             }}
          >
-            {status === 0 && items[`${status}`].info}
+            {/* Skills Tab */}
+            {status === 0 && (
+               <Stack gap={`20px`}>
+                  {skillsList.length === 0 ? (
+                     <Typography sx={{ color: "hsla(0,0%,100%,.6)", fontSize: "16px" }}>
+                        No skills added yet.
+                     </Typography>
+                  ) : (
+                     skillsList.map((skillItem) => (
+                        <Box key={skillItem._id.toString()}>
+                           <Typography
+                              sx={{
+                                 color: "hsla(0,0%,100%,.6)",
+                                 fontSize: `16px`,
+                                 fontWeight: `600`,
+                              }}
+                           >
+                              {skillItem.title}
+                           </Typography>
+                           <Stack
+                              sx={{
+                                 flexWrap: `wrap`,
+                                 mt: `12px`,
+                                 flexDirection: `row`,
+                                 alignItems: `center`,
+                                 gap: `15px`,
+                              }}
+                           >
+                              {skillItem.images?.map((imgName, idx) => {
+                                 const imageUrl = getMediaUrl(FB_FOLDER_SKILL, imgName);
 
+                                 if (imageUrl.includes("skillicons.dev")) {
+                                    return (
+                                       <Box
+                                          key={idx}
+                                          sx={{
+                                             height: "48px",
+                                             display: "inline-block",
+                                             position: "relative",
+                                             transition: "transform 0.2s ease-in-out",
+                                             "&:hover": {
+                                                transform: "scale(1.03)",
+                                             },
+                                          }}
+                                       >
+                                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                                          <img
+                                             src={imageUrl}
+                                             alt="skill-icons"
+                                             style={{
+                                                height: "48px",
+                                                width: "auto",
+                                                maxHeight: "48px",
+                                                display: "block",
+                                             }}
+                                          />
+                                       </Box>
+                                    );
+                                 }
+
+                                 return (
+                                    <Box
+                                       key={idx}
+                                       sx={{
+                                          width: "50px",
+                                          height: "50px",
+                                          position: "relative",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          borderRadius: "11px",
+                                          overflow: "hidden",
+                                          transition: "all 0.2s ease-in-out",
+                                          "&:hover": {
+                                             transform: "scale(1.15)",
+                                          },
+                                       }}
+                                    >
+                                       <Image
+                                          src={imageUrl}
+                                          alt={imgName}
+                                          width={50}
+                                          height={50}
+                                          style={{
+                                             objectFit: "cover",
+                                             width: "100%",
+                                             height: "100%",
+                                             borderRadius: "11px",
+                                          }}
+                                       />
+                                    </Box>
+                                 );
+                              })}
+                           </Stack>
+                        </Box>
+                     ))
+                  )}
+               </Stack>
+            )}
+
+            {/* Education Tab */}
             {status === 1 && <Education dataEducations={dataEducations} />}
 
+            {/* Certification Tab */}
             {status === 2 && <Certification dataCertification={dataCertification} />}
          </Box>
       </>

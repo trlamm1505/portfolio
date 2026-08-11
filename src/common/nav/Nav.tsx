@@ -49,13 +49,21 @@ export default function Nav() {
                   }}
                >
                   {navData.map((item, index) => {
+                     const isActive = item.path === pathName;
                      return (
                         <IconButton
                            onClick={async () => {
                               router.push(item.path);
                            }}
                            key={index}
-                           color={`${item.path === pathName ? "error" : "default"}`}
+                           sx={{
+                              color: isActive ? "#b388ff" : "hsla(0, 0%, 100%, 0.8)",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                 color: "#d1c4e9",
+                                 transform: "scale(1.15)",
+                              },
+                           }}
                         >
                            {item.icon}
                         </IconButton>
@@ -94,17 +102,20 @@ export default function Nav() {
                   }}
                >
                   {navData.map((item, index) => {
+                     const isActive = item.path === pathName;
                      return (
                         <IconButton
                            onClick={async () => {
-                              // setStartTransition(true);
-                              // await wait(1000);
                               router.push(item.path);
-                              // await wait(1000);
-                              // setStartTransition(false);
                            }}
                            key={index}
-                           color={`${item.path === pathName ? "error" : "default"}`}
+                           sx={{
+                              color: isActive ? "#b388ff" : "hsla(0, 0%, 100%, 0.8)",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                 color: "#d1c4e9",
+                              },
+                           }}
                         >
                            {item.icon}
                         </IconButton>

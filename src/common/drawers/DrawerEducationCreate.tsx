@@ -1,9 +1,7 @@
 "use client";
 
 import { createEducationAction } from "@/actions/education.action";
-import { createTextInPageAction } from "@/actions/title-in-page.action";
 import { TEducationCreate } from "@/types/respon/education.type";
-import { TTextInPageCreate } from "@/types/respon/text-in-page.type";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { Box, Button, Drawer, Stack, TextField, Typography } from "@mui/material";
@@ -20,14 +18,23 @@ type TProps = {
 const heightHeader = `70px`;
 const heightFooter = `80px`;
 
+const inputLabelProps = { sx: { color: "#5b21b6", fontWeight: 600 } };
+const inputProps = {
+   sx: {
+      color: "#221638",
+      backgroundColor: "#fcfaff",
+      borderRadius: "12px",
+      fontWeight: 500,
+   },
+};
+
 export default function DrawerEducationCreate({
    openDrawerEducationCreate,
    handleCloseDrawerEducationCreate,
 }: TProps) {
    const [loading, setLoading] = useState<boolean>(false);
 
-   const createTextInPageForm = useFormik({
-      enableReinitialize: true,
+   const createEducationForm = useFormik({
       initialValues: {
          title: ``,
          description: ``,
@@ -37,8 +44,6 @@ export default function DrawerEducationCreate({
          description: Yup.string().trim().required(`Description is required`),
       }),
       onSubmit: async (valuesRaw) => {
-         console.log(`valuesRaw`, valuesRaw);
-
          setLoading(true);
 
          const payload: TEducationCreate = {
@@ -47,13 +52,12 @@ export default function DrawerEducationCreate({
          };
 
          const result = await createEducationAction(payload);
-         console.log(result);
          setLoading(false);
 
          if (!result.status) return toast.error(result.message);
 
          handleCloseDrawerEducationCreate();
-         createTextInPageForm.resetForm();
+         createEducationForm.resetForm();
 
          toast.success(result.message);
       },
@@ -64,13 +68,20 @@ export default function DrawerEducationCreate({
          anchor={`right`}
          open={openDrawerEducationCreate}
          onClose={handleCloseDrawerEducationCreate}
+         PaperProps={{
+            sx: {
+               backgroundColor: "#ffffff",
+               color: "#221638",
+               boxShadow: "-10px 0 40px rgba(139, 92, 246, 0.15)",
+            },
+         }}
       >
          <Box
             sx={{ width: { xs: `90vw`, lg: `500px` }, position: `relative`, height: `100%` }}
             role="presentation"
             component="form"
             autoComplete="false"
-            onSubmit={createTextInPageForm.handleSubmit}
+            onSubmit={createEducationForm.handleSubmit}
          >
             {/* header */}
             <Stack
@@ -78,10 +89,11 @@ export default function DrawerEducationCreate({
                   height: `${heightHeader}`,
                   alignItems: `start`,
                   justifyContent: `center`,
-                  p: `20px 20px 10px`,
+                  p: `20px 24px 10px`,
+                  borderBottom: `1px solid #e7ddfa`,
                }}
             >
-               <Typography sx={{ fontSize: `20px`, fontWeight: `700` }}>
+               <Typography sx={{ fontSize: `22px`, fontWeight: `800`, color: "#3b1874" }}>
                   Create Education
                </Typography>
             </Stack>
@@ -90,46 +102,50 @@ export default function DrawerEducationCreate({
             <Stack
                sx={{
                   height: `calc(100vh - (${heightHeader} + ${heightFooter}))`,
-                  p: `10px 20px`,
+                  p: `24px`,
                   rowGap: `20px`,
                   overflowY: `auto`,
                }}
             >
                {/* title */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={inputLabelProps}
+                  InputProps={inputProps}
                   autoComplete="title"
-                  label="Title"
+                  label="Title (e.g. Bachelor of Software Engineering)"
                   name="title"
-                  value={createTextInPageForm.values.title}
-                  onChange={createTextInPageForm.handleChange}
+                  value={createEducationForm.values.title}
+                  onChange={createEducationForm.handleChange}
                   error={
-                     createTextInPageForm.touched.title &&
-                     createTextInPageForm.errors.title !== undefined
+                     createEducationForm.touched.title &&
+                     createEducationForm.errors.title !== undefined
                   }
                   helperText={
-                     createTextInPageForm.touched.title && createTextInPageForm.errors.title
+                     createEducationForm.touched.title && createEducationForm.errors.title
                   }
                   variant="outlined"
                />
 
                {/* description */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={inputLabelProps}
+                  InputProps={inputProps}
                   multiline
-                  rows={10}
+                  rows={8}
                   autoComplete="description"
                   label="Description"
                   name="description"
-                  value={createTextInPageForm.values.description}
-                  onChange={createTextInPageForm.handleChange}
+                  value={createEducationForm.values.description}
+                  onChange={createEducationForm.handleChange}
                   error={
-                     createTextInPageForm.touched.description &&
-                     createTextInPageForm.errors.description !== undefined
+                     createEducationForm.touched.description &&
+                     createEducationForm.errors.description !== undefined
                   }
                   helperText={
-                     createTextInPageForm.touched.description &&
-                     createTextInPageForm.errors.description
+                     createEducationForm.touched.description &&
+                     createEducationForm.errors.description
                   }
                   variant="outlined"
                />
@@ -140,23 +156,40 @@ export default function DrawerEducationCreate({
                sx={{
                   height: `${heightFooter}`,
                   flexDirection: `row`,
-                  p: `10px 20px 20px`,
-                  gap: `20px`,
+                  p: `10px 24px 20px`,
+                  gap: `16px`,
+                  borderTop: `1px solid #e7ddfa`,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                }}
             >
-               <Button onClick={handleCloseDrawerEducationCreate}>Cancel</Button>
+               <Button
+                  onClick={handleCloseDrawerEducationCreate}
+                  sx={{ color: "#634e8c", fontWeight: 600, textTransform: "none" }}
+               >
+                  Cancel
+               </Button>
 
                <LoadingButton
                   onClick={() => {
-                     createTextInPageForm.handleSubmit();
+                     createEducationForm.handleSubmit();
                   }}
                   loading={loading}
                   loadingPosition="end"
                   endIcon={<SendRoundedIcon sx={{ fontSize: `16px !important` }} />}
                   variant="contained"
                   size="large"
+                  sx={{
+                     borderRadius: "12px",
+                     background: "linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%)",
+                     color: "#ffffff",
+                     fontWeight: "700",
+                     textTransform: "none",
+                     px: 3,
+                     boxShadow: "0 6px 20px rgba(139, 92, 246, 0.3)",
+                  }}
                >
-                  Create
+                  Create Education
                </LoadingButton>
             </Stack>
          </Box>

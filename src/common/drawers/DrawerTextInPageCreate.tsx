@@ -4,7 +4,7 @@ import { createTextInPageAction } from "@/actions/title-in-page.action";
 import { TTextInPageCreate } from "@/types/respon/text-in-page.type";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Box, Button, Drawer, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Chip, Drawer, Stack, TextField, Typography } from "@mui/material";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -25,7 +25,6 @@ export default function DrawerTextInPageCreate({
    const [loading, setLoading] = useState<boolean>(false);
 
    const createTextInPageForm = useFormik({
-      enableReinitialize: true,
       initialValues: {
          page: ``,
          title: ``,
@@ -66,6 +65,13 @@ export default function DrawerTextInPageCreate({
          anchor={`right`}
          open={openDrawerTextInPageCreate}
          onClose={handleCloseDrawerTextInPageCreate}
+         PaperProps={{
+            sx: {
+               backgroundColor: "#ffffff",
+               color: "#221638",
+               boxShadow: "-10px 0 40px rgba(139, 92, 246, 0.15)",
+            },
+         }}
       >
          <Box
             sx={{ width: { xs: `90vw`, lg: `500px` }, position: `relative`, height: `100%` }}
@@ -80,10 +86,11 @@ export default function DrawerTextInPageCreate({
                   height: `${heightHeader}`,
                   alignItems: `start`,
                   justifyContent: `center`,
-                  p: `20px 20px 10px`,
+                  p: `20px 24px 10px`,
+                  borderBottom: `1px solid #e7ddfa`,
                }}
             >
-               <Typography sx={{ fontSize: `20px`, fontWeight: `700` }}>
+               <Typography sx={{ fontSize: `22px`, fontWeight: `800`, color: "#3b1874" }}>
                   Create Text In Page
                </Typography>
             </Stack>
@@ -92,16 +99,74 @@ export default function DrawerTextInPageCreate({
             <Stack
                sx={{
                   height: `calc(100vh - (${heightHeader} + ${heightFooter}))`,
-                  p: `10px 20px`,
+                  p: `24px`,
                   rowGap: `20px`,
                   overflowY: `auto`,
                }}
             >
+               {/* Quick Social Presets */}
+               <Box sx={{ mb: 0.5 }}>
+                  <Typography variant="caption" fontWeight="700" color="#7c3aed" display="block" mb={1}>
+                     ⚡ Quick Presets for Social Links:
+                  </Typography>
+                  <Stack direction="row" flexWrap="wrap" gap={1}>
+                     <Chip
+                        label="🐙 GitHub"
+                        size="small"
+                        onClick={() => {
+                           createTextInPageForm.setFieldValue("page", "social");
+                           createTextInPageForm.setFieldValue("title", "GitHub");
+                           createTextInPageForm.setFieldValue("description", "https://github.com/trlamm1505");
+                        }}
+                        sx={{ backgroundColor: "#f3eefc", color: "#6c2bd9", fontWeight: 600, cursor: "pointer" }}
+                     />
+                     <Chip
+                        label="📘 Facebook"
+                        size="small"
+                        onClick={() => {
+                           createTextInPageForm.setFieldValue("page", "social");
+                           createTextInPageForm.setFieldValue("title", "Facebook");
+                           createTextInPageForm.setFieldValue("description", "https://www.facebook.com/Suduy.1505");
+                        }}
+                        sx={{ backgroundColor: "#e7f3ff", color: "#1877f2", fontWeight: 600, cursor: "pointer" }}
+                     />
+                     <Chip
+                        label="💼 LinkedIn"
+                        size="small"
+                        onClick={() => {
+                           createTextInPageForm.setFieldValue("page", "social");
+                           createTextInPageForm.setFieldValue("title", "LinkedIn");
+                           createTextInPageForm.setFieldValue("description", "https://www.linkedin.com/in/tqlam150504/");
+                        }}
+                        sx={{ backgroundColor: "#e8f4f9", color: "#0a66c2", fontWeight: 600, cursor: "pointer" }}
+                     />
+                     <Chip
+                        label="📄 CV Resume"
+                        size="small"
+                        onClick={() => {
+                           createTextInPageForm.setFieldValue("page", "social");
+                           createTextInPageForm.setFieldValue("title", "CV Resume");
+                           createTextInPageForm.setFieldValue("description", "https://drive.google.com/file/d/1d9jTYRwv09XPlU8oDDXFuvfZ-jVsLG4Q/view?usp=sharing");
+                        }}
+                        sx={{ backgroundColor: "#fce8e6", color: "#ea4335", fontWeight: 600, cursor: "pointer" }}
+                     />
+                  </Stack>
+               </Box>
+
                {/* page */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   autoComplete="page"
-                  label="Page"
+                  label="Page Route (e.g. / or /about or /contact)"
                   name="page"
                   value={createTextInPageForm.values.page}
                   onChange={createTextInPageForm.handleChange}
@@ -112,7 +177,16 @@ export default function DrawerTextInPageCreate({
 
                {/* title */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   autoComplete="title"
                   label="Title"
                   name="title"
@@ -127,9 +201,18 @@ export default function DrawerTextInPageCreate({
 
                {/* description */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   multiline
-                  rows={10}
+                  rows={8}
                   autoComplete="description"
                   label="Description"
                   name="description"
@@ -151,11 +234,16 @@ export default function DrawerTextInPageCreate({
                sx={{
                   height: `${heightFooter}`,
                   flexDirection: `row`,
-                  p: `10px 20px 20px`,
-                  gap: `20px`,
+                  p: `10px 24px 20px`,
+                  gap: `16px`,
+                  borderTop: `1px solid #e7ddfa`,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                }}
             >
-               <Button onClick={handleCloseDrawerTextInPageCreate}>Cancel</Button>
+               <Button onClick={handleCloseDrawerTextInPageCreate} sx={{ color: "#634e8c", fontWeight: 600, textTransform: "none" }}>
+                  Cancel
+               </Button>
 
                <LoadingButton
                   onClick={() => {
@@ -166,8 +254,16 @@ export default function DrawerTextInPageCreate({
                   endIcon={<SendRoundedIcon sx={{ fontSize: `16px !important` }} />}
                   variant="contained"
                   size="large"
+                  sx={{
+                     borderRadius: "12px",
+                     background: "linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%)",
+                     color: "#ffffff",
+                     fontWeight: "700",
+                     textTransform: "none",
+                     px: 3,
+                  }}
                >
-                  Create
+                  Create Text
                </LoadingButton>
             </Stack>
          </Box>

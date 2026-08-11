@@ -9,6 +9,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {
+   Autocomplete,
    Box,
    Button,
    Divider,
@@ -57,44 +58,58 @@ export default function DrawerMyProjectCreate({
    const createProjectForm = useFormik({
       initialValues: {
          title: ``,
+         category: `Work Experience`,
+         company_name: ``,
+         location: ``,
+         date_range: ``,
+         github_link: ``,
+         demo_link: ``,
+         link: ``,
+         technologies: ``,
          description: ``,
-         platform: ``,
-         type: ``,
          imgProject: ``,
          imgLogo: ``,
       },
       validationSchema: Yup.object().shape({
          title: Yup.string().trim().required(`Name is required`),
          description: Yup.string().trim().required(`Description is required`),
-         platform: Yup.string().trim().required(`Platform is required`),
-         type: Yup.string().trim().required(`Type is required`),
-         // imgProject: Yup.string().trim().required(`Image project is required`),
-         // imgLogo: Yup.string().trim().required(`Image logo is required`),
       }),
       onSubmit: async (valuesRaw) => {
          console.log(valuesRaw);
 
-         if (!fileImgProject) return toast.error("Not found file img project");
-         if (!fileImgLogo) return toast.error("Not found file img logo");
-
-         if (!isFileSizeValid(fileImgProject)) return toast.warning("File size failed > 1mb");
-         if (!isFileSizeValid(fileImgLogo)) return toast.warning("File size failed > 1mb");
-
          setLoading(true);
 
-         const imgProjectName = await uploadWithFirebase(fileImgProject, FB_FOLDER_PROJECT);
-         if (!imgProjectName) return setLoading(false);
+         let imgProjectName = "";
+         if (fileImgProject) {
+            if (!isFileSizeValid(fileImgProject, 10)) {
+               setLoading(false);
+               return toast.warning("Project image file size > 10MB");
+            }
+            imgProjectName = (await uploadWithFirebase(fileImgProject, FB_FOLDER_PROJECT)) || "";
+         }
 
-         const imgLogoName = await uploadWithFirebase(fileImgLogo, FB_FOLDER_LOGO);
-         if (!imgLogoName) return setLoading(false);
+         let imgLogoName = "";
+         if (fileImgLogo) {
+            if (!isFileSizeValid(fileImgLogo, 10)) {
+               setLoading(false);
+               return toast.warning("Logo image file size > 10MB");
+            }
+            imgLogoName = (await uploadWithFirebase(fileImgLogo, FB_FOLDER_LOGO)) || "";
+         }
 
          const payload: TPayloadProject = {
             description: valuesRaw.description,
+            category: valuesRaw.category,
+            company_name: valuesRaw.company_name,
+            location: valuesRaw.location,
+            date_range: valuesRaw.date_range,
+            github_link: valuesRaw.github_link,
+            demo_link: valuesRaw.demo_link || "",
+            link: valuesRaw.demo_link || "",
+            technologies: valuesRaw.technologies,
             img_logo_name: imgLogoName,
             img_project_name: imgProjectName,
-            platform: valuesRaw.platform,
             title: valuesRaw.title,
-            type: valuesRaw.type,
          };
 
          const result = await createProjectAction(payload);
@@ -121,6 +136,13 @@ export default function DrawerMyProjectCreate({
          anchor={`right`}
          open={openDrawerMyProjectCreate}
          onClose={handleCloseDrawerMyProjectCreate}
+         PaperProps={{
+            sx: {
+               backgroundColor: "#ffffff",
+               color: "#221638",
+               boxShadow: "-10px 0 40px rgba(139, 92, 246, 0.15)",
+            },
+         }}
       >
          <Box
             sx={{ width: { xs: `90vw`, lg: `500px` }, position: `relative`, height: `100%` }}
@@ -150,9 +172,41 @@ export default function DrawerMyProjectCreate({
                   overflowY: `auto`,
                }}
             >
+               {/* Project Category (AT THE VERY TOP) */}
+               <TextField
+                  select
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 600,
+                     },
+                  }}
+                  label="Project Category"
+                  name="category"
+                  value={createProjectForm.values.category}
+                  onChange={createProjectForm.handleChange}
+                  variant="outlined"
+               >
+                  <MenuItem value="Work Experience">💼 Work Experience</MenuItem>
+                  <MenuItem value="Personal Projects">🚀 Personal Projects</MenuItem>
+               </TextField>
+
                {/* title */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   autoComplete="title"
                   label="Title"
                   name="title"
@@ -165,49 +219,96 @@ export default function DrawerMyProjectCreate({
                   variant="outlined"
                />
 
-               {/* platform */}
+               {/* company_name (Tag 1) */}
                <TextField
-                  sx={{ width: `100%` }}
-                  autoComplete="platform"
-                  label="Platform"
-                  name="platform"
-                  value={createProjectForm.values.platform}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Tag / Sub-title 1 (e.g. Capstone Project, ILA Vietnam)"
+                  name="company_name"
+                  value={createProjectForm.values.company_name}
                   onChange={createProjectForm.handleChange}
-                  error={
-                     createProjectForm.touched.platform &&
-                     createProjectForm.errors.platform !== undefined
-                  }
-                  helperText={
-                     createProjectForm.touched.platform && createProjectForm.errors.platform
-                  }
                   variant="outlined"
                />
 
-               {/* type */}
+               {/* location (Tag 2) */}
                <TextField
-                  sx={{ width: `100%` }}
-                  select
-                  label="Type"
-                  name="type"
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Tag / Sub-title 2 (e.g. Front-end Developer, Ho Chi Minh City)"
+                  name="location"
+                  value={createProjectForm.values.location}
                   onChange={createProjectForm.handleChange}
-                  value={createProjectForm.values.type}
-                  error={
-                     createProjectForm.touched.type && createProjectForm.errors.type !== undefined
-                  }
-                  helperText={createProjectForm.touched.type && createProjectForm.errors.type}
-               >
-                  {dataTypeProjects?.data?.map((option) => (
-                     <MenuItem key={option._id.toString()} value={option._id.toString()}>
-                        {option.type}
-                     </MenuItem>
-                  ))}
-               </TextField>
+                  variant="outlined"
+               />
 
-               {/* description */}
+               {/* date_range */}
                <TextField
-                  sx={{ width: `100%` }}
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Date Range (e.g. Jan 2026 – Present)"
+                  name="date_range"
+                  value={createProjectForm.values.date_range}
+                  onChange={createProjectForm.handleChange}
+                  variant="outlined"
+               />
+
+               {/* technologies */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Technologies (comma separated, e.g. React Native, TypeScript, TanStack)"
+                  name="technologies"
+                  value={createProjectForm.values.technologies}
+                  onChange={createProjectForm.handleChange}
+                  variant="outlined"
+               />
+
+               {/* description (PLACED ABOVE LINK FIELDS) */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
                   multiline
-                  rows={10}
+                  rows={8}
                   autoComplete="description"
                   label="Description"
                   name="description"
@@ -218,8 +319,48 @@ export default function DrawerMyProjectCreate({
                      createProjectForm.errors.description !== undefined
                   }
                   helperText={
-                     createProjectForm.touched.description && createProjectForm.errors.description
+                     (createProjectForm.touched.description &&
+                        createProjectForm.errors.description) ||
+                     "Max 10 lines: 1 summary paragraph line + up to 9 bullet points starting with •"
                   }
+                  variant="outlined"
+               />
+
+               {/* GitHub Link */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="GitHub Link (e.g. https://github.com/...)"
+                  name="github_link"
+                  value={createProjectForm.values.github_link}
+                  onChange={createProjectForm.handleChange}
+                  variant="outlined"
+               />
+
+               {/* Demo Link */}
+               <TextField
+                  fullWidth
+                  InputLabelProps={{ sx: { color: "#5b21b6", fontWeight: 600 } }}
+                  InputProps={{
+                     sx: {
+                        color: "#221638",
+                        backgroundColor: "#fcfaff",
+                        borderRadius: "12px",
+                        fontWeight: 500,
+                     },
+                  }}
+                  label="Live Demo Link (e.g. https://my-app.vercel.app)"
+                  name="demo_link"
+                  value={createProjectForm.values.demo_link}
+                  onChange={createProjectForm.handleChange}
                   variant="outlined"
                />
 
@@ -322,24 +463,37 @@ export default function DrawerMyProjectCreate({
                sx={{
                   height: `${heightFooter}`,
                   flexDirection: `row`,
-                  p: `10px 20px 20px`,
-                  gap: `20px`,
+                  p: `10px 24px 20px`,
+                  gap: `16px`,
+                  borderTop: `1px solid #e7ddfa`,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                }}
             >
-               <Button onClick={handleCloseDrawerMyProjectCreate}>Cancel</Button>
+               <Button onClick={handleCloseDrawerMyProjectCreate} sx={{ color: "#634e8c", fontWeight: 600, textTransform: "none" }}>
+                  Cancel
+               </Button>
 
                <LoadingButton
                   onClick={() => {
                      createProjectForm.handleSubmit();
                   }}
-                  // type="submit"
                   loading={loading}
                   loadingPosition="end"
                   endIcon={<SendRoundedIcon sx={{ fontSize: `16px !important` }} />}
                   variant="contained"
                   size="large"
+                  sx={{
+                     borderRadius: "12px",
+                     background: "linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%)",
+                     color: "#ffffff",
+                     fontWeight: "700",
+                     textTransform: "none",
+                     px: 3,
+                     boxShadow: "0 6px 20px rgba(139, 92, 246, 0.3)",
+                  }}
                >
-                  Create
+                  Create Project
                </LoadingButton>
             </Stack>
          </Box>

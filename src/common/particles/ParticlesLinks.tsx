@@ -1,24 +1,27 @@
 "use client";
 
 import { loadFull } from "tsparticles";
-import { useCallback } from "react";
-import Particles from "react-tsparticles";
-import { Engine } from "tsparticles-engine";
+import { useEffect, useState } from "react";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { Engine } from "@tsparticles/engine";
 import { Box } from "@mui/material";
 
 function ParticlesLinks() {
-  // init
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadFull(engine);
+  const [init, setInit] = useState(false);
+
+  useEffect(() => {
+    initParticlesEngine(async (engine: Engine) => {
+      await loadFull(engine);
+    }).then(() => {
+      setInit(true);
+    });
   }, []);
 
-  const particlesLoaded = useCallback(async () => {}, []);
+  if (!init) return null;
 
   return (
     <Particles
       id="ParticlesLinks"
-      init={particlesInit}
-      loaded={particlesLoaded}
       options={{
         fullScreen: { enable: false },
         background: {
@@ -51,14 +54,14 @@ function ParticlesLinks() {
         },
         particles: {
           color: {
-            value: "#e68e2e",
+            value: "#b388ff",
           },
           links: {
-            color: "#f5d393",
-            distance: 200,
+            color: "#d1c4e9",
+            distance: 250,
             enable: true,
-            opacity: 0.5,
-            width: 1,
+            opacity: 0.7,
+            width: 1.2,
           },
           collisions: {
             enable: true,
@@ -76,9 +79,10 @@ function ParticlesLinks() {
           number: {
             density: {
               enable: true,
-              area: 600,
+              width: 1920,
+              height: 1080,
             },
-            value: 50,
+            value: 110,
           },
           opacity: {
             value: 0.5,

@@ -1,5 +1,10 @@
-// EamrXTuy8KXSZklM
 import mongoose, { ConnectOptions } from "mongoose";
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first");
+try {
+   dns.setServers(["8.8.8.8", "8.8.4.4"]);
+} catch (e) {}
 
 interface Connection {
    connected?: number;
@@ -7,25 +12,19 @@ interface Connection {
 
 const connection: Connection = {};
 
-// console.log(`process.env.MONGODB_URI: `, process.env.MONGODB_URI);
-// console.log(`process.env.MONGODB_USER: `, process.env.MONGODB_USER);
-// console.log(`process.env.MONGODB_PASSWORD: `, process.env.MONGODB_PASSWORD);
-// console.log(`process.env.TOKEN_SECRET: `, process.env.TOKEN_SECRET);
-// console.log(`process.env.TOKEN_EXPIRES: `, process.env.TOKEN_EXPIRES);
-
 const MongooseClient = async (): Promise<void> => {
    try {
       if (connection.connected) return;
 
-      const dbConfig = {
-         uri: process.env.MONGODB_URI as string,
-         options: {
-            user: process.env.MONGODB_USER as string,
-            pass: process.env.MONGODB_PASSWORD as string,
-         } as ConnectOptions,
-      };
+      let uri = process.env.MONGODB_URI as string;
+      const user = process.env.MONGODB_USER as string;
+      const pass = process.env.MONGODB_PASSWORD as string;
 
-      const db = await mongoose.connect(dbConfig.uri);
+      if (uri && uri.includes("<db_password>") && pass) {
+         uri = uri.replace("<db_password>", encodeURIComponent(pass));
+      }
+
+      const db = await mongoose.connect(uri);
 
       // console.log(db);
 

@@ -1,4 +1,4 @@
 export const ENDPOINT_GITHUB = {
     BASE: `https://api.github.com/users`,
-    INFO_GITHUB: () => `${ENDPOINT_GITHUB.BASE}/vulebaolong`
+    INFO_GITHUB: () => `${ENDPOINT_GITHUB.BASE}/trlamm1505`
 }
