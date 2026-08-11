@@ -202,7 +202,7 @@ export default function Login() {
                         "&:hover": { color: "#8b5cf6" },
                      }}
                   >
-                     Don't have an account? <Box component="span" sx={{ color: "#8b5cf6", fontWeight: 700 }}>Register now</Box>
+                     Don&apos;t have an account? <Box component="span" sx={{ color: "#8b5cf6", fontWeight: 700 }}>Register now</Box>
                   </Typography>
                </Stack>
             </Paper>
